@@ -6,212 +6,253 @@
     {
       "name": "data-table",
       "type": "registry:block",
-      "title": "Data Table with Filters",
-      "description": "Generic data table with filtering (input, checkbox, slider, timerange), sorting, pagination, column visibility, command palette, and nuqs URL state management.",
+      "title": "Data Table (All Variants)",
+      "description": "Generic data table with filtering, infinite scroll variant, and tree variant. Fully featured.",
       "dependencies": [
-        "@tanstack/react-table",
-        "@tanstack/react-query",
-        "nuqs",
         "date-fns",
-        "cmdk",
-        "lucide-react"
+        "@tanstack/react-query",
+        "lucide-react",
+        "@tanstack/react-table",
+        "nuqs",
+        "cmdk"
       ],
       "registryDependencies": [
-        "table",
-        "badge",
-        "button",
-        "checkbox",
-        "accordion",
         "command",
-        "popover",
-        "slider",
-        "calendar",
         "input",
-        "separator",
+        "slider",
+        "table",
+        "accordion",
+        "badge",
+        "tooltip",
+        "button",
+        "dropdown-menu",
         "sheet",
         "skeleton",
-        "tooltip",
-        "dropdown-menu"
+        "popover",
+        "checkbox",
+        "separator",
+        "calendar"
       ],
       "files": [
         {
           "path": "src/components/data-table/data-table.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table.tsx"
         },
         {
           "path": "src/components/data-table/data-table-provider.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-provider.tsx"
         },
         {
           "path": "src/components/data-table/data-table-toolbar.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-toolbar.tsx"
         },
         {
           "path": "src/components/data-table/data-table-pagination.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-pagination.tsx"
         },
         {
           "path": "src/components/data-table/data-table-filter-controls.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-controls.tsx"
         },
         {
           "path": "src/components/data-table/data-table-filter-controls-drawer.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-controls-drawer.tsx"
         },
         {
           "path": "src/components/data-table/data-table-filter-command/index.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-command/index.tsx"
         },
         {
           "path": "src/components/data-table/data-table-filter-command/utils.ts",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-command/utils.ts"
         },
         {
           "path": "src/components/data-table/data-table-filter-checkbox.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-checkbox.tsx"
         },
         {
           "path": "src/components/data-table/data-table-filter-input.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-input.tsx"
         },
         {
           "path": "src/components/data-table/data-table-filter-slider.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-slider.tsx"
         },
         {
           "path": "src/components/data-table/data-table-filter-timerange.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-timerange.tsx"
         },
         {
           "path": "src/components/data-table/data-table-filter-reset-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-filter-reset-button.tsx"
         },
         {
           "path": "src/components/data-table/data-table-reset-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-reset-button.tsx"
         },
         {
           "path": "src/components/data-table/data-table-column-header.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-column-header.tsx"
         },
         {
           "path": "src/components/data-table/data-table-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-skeleton.tsx"
         },
         {
           "path": "src/components/data-table/data-table-view-options.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-view-options.tsx"
         },
         {
           "path": "src/components/data-table/data-table-store-sync.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-store-sync.tsx"
         },
         {
           "path": "src/components/data-table/data-table-refresh-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-refresh-button.tsx"
         },
         {
           "path": "src/components/data-table/data-table-sheet/data-table-sheet-content.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-sheet/data-table-sheet-content.tsx"
         },
         {
           "path": "src/components/data-table/data-table-sheet/data-table-sheet-details.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-sheet/data-table-sheet-details.tsx"
         },
         {
           "path": "src/components/data-table/data-table-sheet/data-table-sheet-row-action.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-sheet/data-table-sheet-row-action.tsx"
         },
         {
           "path": "src/components/data-table/data-table-sheet/data-table-sheet-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-sheet/data-table-sheet-skeleton.tsx"
         },
         {
           "path": "src/components/data-table/data-table-cell/index.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-cell/index.tsx"
         },
         {
           "path": "src/components/data-table/data-table-cell/data-table-cell-badge.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-cell/data-table-cell-badge.tsx"
         },
         {
           "path": "src/components/data-table/data-table-cell/data-table-cell-boolean.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-cell/data-table-cell-boolean.tsx"
         },
         {
           "path": "src/components/data-table/data-table-cell/data-table-cell-code.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-cell/data-table-cell-code.tsx"
         },
         {
           "path": "src/components/data-table/data-table-cell/data-table-cell-number.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-cell/data-table-cell-number.tsx"
         },
         {
           "path": "src/components/data-table/data-table-cell/data-table-cell-text.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-cell/data-table-cell-text.tsx"
         },
         {
           "path": "src/components/data-table/data-table-cell/data-table-cell-timestamp.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-cell/data-table-cell-timestamp.tsx"
         },
         {
           "path": "src/components/data-table/types.ts",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/types.ts"
         },
         {
           "path": "src/components/data-table/utils.ts",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/utils.ts"
         },
-        { "path": "src/lib/store/index.ts", "type": "registry:lib" },
-        { "path": "src/lib/store/schema/field.ts", "type": "registry:lib" },
-        { "path": "src/lib/store/schema/index.ts", "type": "registry:lib" },
+        {
+          "path": "src/lib/store/index.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/index.ts"
+        },
+        {
+          "path": "src/lib/store/schema/field.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/schema/field.ts"
+        },
+        {
+          "path": "src/lib/store/schema/index.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/schema/index.ts"
+        },
         {
           "path": "src/lib/store/schema/serialization.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/schema/serialization.ts"
         },
-        { "path": "src/lib/store/schema/types.ts", "type": "registry:lib" },
+        {
+          "path": "src/lib/store/schema/types.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/schema/types.ts"
+        },
         {
           "path": "src/lib/store/adapters/nuqs/index.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/adapters/nuqs/index.ts"
         },
         {
           "path": "src/lib/store/provider/DataTableStoreProvider.tsx",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/provider/DataTableStoreProvider.tsx"
         },
         {
           "path": "src/lib/store/hooks/useFilterState.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/hooks/useFilterState.ts"
         },
         {
           "path": "src/lib/store/hooks/useFilterActions.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/hooks/useFilterActions.ts"
         },
-        { "path": "src/lib/is-array.ts", "type": "registry:lib" }
-      ]
-    },
-    {
-      "name": "data-table-infinite",
-      "type": "registry:block",
-      "title": "Data Table Infinite Scroll",
-      "description": "Infinite scroll variant of Data Table. Adds row selection, column reordering, column resizing, sheet detail panel, chart slot, live mode, and virtual scroll. Requires data-table.",
-      "registryDependencies": ["data-table"],
-      "files": [
+        {
+          "path": "src/lib/is-array.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/is-array.ts"
+        },
         {
           "path": "src/components/data-table/data-table-infinite.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "data-table-tree",
-      "type": "registry:block",
-      "title": "Data Table Tree View",
-      "description": "Tree/hierarchical data variant of Data Table. Adds inline expand/collapse with depth-based indentation, ancestor-preserving filters (filterFromLeafRows), and optional infinite scroll support. Requires data-table.",
-      "registryDependencies": ["data-table"],
-      "files": [
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-infinite.tsx"
+        },
         {
           "path": "src/components/data-table/data-table-tree.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/data-grid/data-table-tree.tsx"
         }
       ]
     }

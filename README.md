@@ -24,24 +24,12 @@ More Examples:
 
 ## Shadcn Registry Installation
 
-You can now add the components directly to your project using the `shadcn` CLI, because this repository acts as a custom registry!
+You can now add the data-table components directly to your project using the `shadcn` CLI. This repository acts as a custom registry, and the installation command will automatically place all files cleanly into a `components/data-grid` directory in your project, preserving the folder structure.
 
-To add the standard Data Table:
+To install everything (Standard Data Table, Infinite Scroll, and Tree variants):
 
 ```bash
 npx shadcn@latest add https://raw.githubusercontent.com/pgupta1795/data-grid-shadcn/main/public/r/data-table.json
-```
-
-To add the Infinite Scroll version:
-
-```bash
-npx shadcn@latest add https://raw.githubusercontent.com/pgupta1795/data-grid-shadcn/main/public/r/data-table-infinite.json
-```
-
-To add the Tree variants:
-
-```bash
-npx shadcn@latest add https://raw.githubusercontent.com/pgupta1795/data-grid-shadcn/main/public/r/data-table-tree.json
 ```
 
 ## BYOS (Bring Your Own Store)
