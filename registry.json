@@ -253,6 +253,76 @@
           "path": "src/components/data-table/data-table-tree.tsx",
           "type": "registry:component",
           "target": "components/data-grid/data-table-tree.tsx"
+        },
+        {
+          "path": "src/components/custom/kbd.tsx",
+          "type": "registry:component",
+          "target": "components/data-grid/custom/kbd.tsx"
+        },
+        {
+          "path": "src/hooks/use-hot-key.ts",
+          "type": "registry:hook",
+          "target": "hooks/use-hot-key.ts"
+        },
+        {
+          "path": "src/lib/format.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/format.ts"
+        },
+        {
+          "path": "src/providers/controls.tsx",
+          "type": "registry:component",
+          "target": "components/data-grid/providers/controls.tsx"
+        },
+        {
+          "path": "src/lib/constants/local-storage.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/constants/local-storage.ts"
+        },
+        {
+          "path": "src/hooks/use-local-storage.ts",
+          "type": "registry:hook",
+          "target": "hooks/use-local-storage.ts"
+        },
+        {
+          "path": "src/hooks/use-media-query.ts",
+          "type": "registry:hook",
+          "target": "hooks/use-media-query.ts"
+        },
+        {
+          "path": "src/components/custom/input-with-addons.tsx",
+          "type": "registry:component",
+          "target": "components/data-grid/custom/input-with-addons.tsx"
+        },
+        {
+          "path": "src/hooks/use-debounce.ts",
+          "type": "registry:hook",
+          "target": "hooks/use-debounce.ts"
+        },
+        {
+          "path": "src/components/custom/slider.tsx",
+          "type": "registry:component",
+          "target": "components/data-grid/custom/slider.tsx"
+        },
+        {
+          "path": "src/components/custom/date-picker-with-range.tsx",
+          "type": "registry:component",
+          "target": "components/data-grid/custom/date-picker-with-range.tsx"
+        },
+        {
+          "path": "src/hooks/use-copy-to-clipboard.ts",
+          "type": "registry:hook",
+          "target": "hooks/use-copy-to-clipboard.ts"
+        },
+        {
+          "path": "src/components/custom/text-with-tooltip.tsx",
+          "type": "registry:component",
+          "target": "components/data-grid/custom/text-with-tooltip.tsx"
+        },
+        {
+          "path": "src/lib/table/filterfns.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table/filterfns.ts"
         }
       ]
     }
