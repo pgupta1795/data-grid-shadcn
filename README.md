@@ -22,6 +22,28 @@ More Examples:
 
 - [OpenStatus Light Viewer](https://data-table.openstatus.dev/light) (UI for [`vercel-edge-ping`](https://github.com/OpenStatusHQ/vercel-edge-ping))
 
+## Shadcn Registry Installation
+
+You can now add the components directly to your project using the `shadcn` CLI, because this repository acts as a custom registry!
+
+To add the standard Data Table:
+
+```bash
+npx shadcn@latest add https://raw.githubusercontent.com/pgupta1795/data-grid-shadcn/main/public/r/data-table.json
+```
+
+To add the Infinite Scroll version:
+
+```bash
+npx shadcn@latest add https://raw.githubusercontent.com/pgupta1795/data-grid-shadcn/main/public/r/data-table-infinite.json
+```
+
+To add the Tree variants:
+
+```bash
+npx shadcn@latest add https://raw.githubusercontent.com/pgupta1795/data-grid-shadcn/main/public/r/data-table-tree.json
+```
+
 ## BYOS (Bring Your Own Store)
 
 We support a flexible adapter pattern for state management called **BYOS** (Bring Your Own Store). This allows you to:
