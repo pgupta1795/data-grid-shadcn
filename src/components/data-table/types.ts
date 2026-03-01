@@ -89,3 +89,6 @@ export type SheetField<TData, TMeta = Record<string, unknown>> = {
   className?: string;
   skeletonClassName?: string;
 };
+
+/** Generic chart data row: timestamp + any numeric keys (e.g. error, warning, success counts). */
+export type BaseChartSchema = { timestamp: number; [key: string]: number };

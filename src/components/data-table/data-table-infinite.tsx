@@ -1,6 +1,7 @@
 "use client";
 
-// REMINDER: React Compiler is not compatible with Tanstack Table v8 https://github.com/TanStack/table/issues/5567
+// REMINDER: React Compiler is not compatible with TanStack Table v8
+// https://github.com/TanStack/table/issues/5567
 "use no memo";
 
 import {
@@ -17,11 +18,8 @@ import { DataTableProvider } from "@/components/data-table/data-table-provider";
 import { DataTableResetButton } from "@/components/data-table/data-table-reset-button";
 import { MemoizedDataTableSheetContent } from "@/components/data-table/data-table-sheet/data-table-sheet-content";
 import { DataTableSheetDetails } from "@/components/data-table/data-table-sheet/data-table-sheet-details";
-import { DataTableToolbar } from "@/components/data-table/data-table-toolbar"; // TODO: check where to put this
-import type {
-  DataTableFilterField,
-  SheetField,
-} from "@/components/data-table/types";
+import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
+import type { BaseChartSchema, DataTableFilterField, SheetField } from "@/components/data-table/types";
 import { Button } from "@/components/ui/button";
 import { useHotKey } from "@/hooks/use-hot-key";
 import { useLocalStorage } from "@/hooks/use-local-storage";
@@ -30,15 +28,14 @@ import {
   getColumnVisibilityKey,
 } from "@/lib/constants/local-storage";
 import { formatCompactNumber } from "@/lib/format";
-import type { AdapterType } from "@/lib/store";
-import { useFilterState } from "@/lib/store";
 import type { SchemaDefinition } from "@/lib/store/schema/types";
+import { useFilterState } from "@/lib/store";
 import { arrSome, inDateRange } from "@/lib/table/filterfns";
 import { cn } from "@/lib/utils";
-import {
+import type {
+  FetchNextPageOptions,
   FetchPreviousPageOptions,
   RefetchOptions,
-  type FetchNextPageOptions,
 } from "@tanstack/react-query";
 import type {
   ColumnDef,
@@ -53,72 +50,67 @@ import type {
 import {
   flexRender,
   getCoreRowModel,
+  getFacetedMinMaxValues as getTTableFacetedMinMaxValues,
   getFacetedRowModel,
+  getFacetedUniqueValues as getTTableFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
-  getFacetedMinMaxValues as getTTableFacetedMinMaxValues,
-  getFacetedUniqueValues as getTTableFacetedUniqueValues,
   useReactTable,
 } from "@tanstack/react-table";
 import { LoaderCircle } from "lucide-react";
 import * as React from "react";
-import { LiveButton } from "./_components/live-button";
-import { RefreshButton } from "./_components/refresh-button";
-import { SocialsFooter } from "./_components/socials-footer";
-import { BaseChartSchema } from "./schema";
-import { TimelineChart } from "./timeline-chart";
 
-// TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, TMeta> {
+  // ── Core ──────────────────────────────────────────────────────────────────
   columns: ColumnDef<TData, TValue>[];
-  getRowClassName?: (row: Row<TData>) => string;
-  // REMINDER: make sure to pass the correct id to access the rows
-  getRowId?: TableOptions<TData>["getRowId"];
   data: TData[];
+  schema: SchemaDefinition;
+  tableId?: string;
+
+  // ── Required scroll props ─────────────────────────────────────────────────
+  fetchNextPage: (options?: FetchNextPageOptions) => Promise<unknown>;
+  refetch: (options?: RefetchOptions) => void;
+  meta: TMeta;
+
+  // ── State defaults ────────────────────────────────────────────────────────
   defaultColumnFilters?: ColumnFiltersState;
   defaultColumnSorting?: SortingState;
   defaultRowSelection?: RowSelectionState;
   defaultColumnVisibility?: VisibilityState;
+
+  // ── Filter / facet ────────────────────────────────────────────────────────
   filterFields?: DataTableFilterField<TData>[];
   sheetFields?: SheetField<TData, TMeta>[];
-  // REMINDER: close to the same signature as the `getFacetedUniqueValues` of the `useReactTable`
-  getFacetedUniqueValues?: (
-    table: TTable<TData>,
-    columnId: string,
-  ) => Map<string, number>;
-  getFacetedMinMaxValues?: (
-    table: TTable<TData>,
-    columnId: string,
-  ) => undefined | [number, number];
+  getFacetedUniqueValues?: (table: TTable<TData>, columnId: string) => Map<string, number>;
+  getFacetedMinMaxValues?: (table: TTable<TData>, columnId: string) => [number, number] | undefined;
+
+  // ── Row options ───────────────────────────────────────────────────────────
+  getRowClassName?: (row: Row<TData>) => string;
+  getRowId?: TableOptions<TData>["getRowId"];
+
+  // ── Counts / loading ──────────────────────────────────────────────────────
   totalRows?: number;
   filterRows?: number;
   totalRowsFetched?: number;
-  meta: TMeta;
-  chartData?: BaseChartSchema[];
-  chartDataColumnId: string;
   isFetching?: boolean;
   isLoading?: boolean;
   hasNextPage?: boolean;
-  fetchNextPage: (
-    options?: FetchNextPageOptions | undefined,
-  ) => Promise<unknown>;
-  fetchPreviousPage?: (
-    options?: FetchPreviousPageOptions | undefined,
-  ) => Promise<unknown>;
-  refetch: (options?: RefetchOptions | undefined) => void;
+  fetchPreviousPage?: (options?: FetchPreviousPageOptions) => Promise<unknown>;
+
+  // ── Chart ─────────────────────────────────────────────────────────────────
+  /** @deprecated Use renderChart instead. Kept for backwards compatibility. */
+  chartData?: BaseChartSchema[];
+  chartDataColumnId?: string;
+
+  // ── Render slots ──────────────────────────────────────────────────────────
   renderLiveRow?: (props?: { row: Row<TData> }) => React.ReactNode;
   renderSheetTitle: (props: { row?: Row<TData> }) => React.ReactNode;
-  // TODO:
+  /** Renders below the command bar, above the table header */
   renderChart?: () => React.ReactNode;
-  // Schema definition for BYOS filter command
-  schema: SchemaDefinition;
-  // Used to store column order and visibility in local storage for specific data-table namespace
-  tableId?: string;
-  // Show the prefetch toggle button in the toolbar
-  showConfigurationDropdown?: boolean;
-  // Adapter toggle and prefetch toggle (for demo purposes)
-  adapterType?: AdapterType;
-  prefetchEnabled?: boolean;
+  /** Passed to DataTableToolbar — renders after reset button, before view options */
+  renderActions?: () => React.ReactNode;
+  /** Renders at the bottom of the sidebar */
+  renderSidebarFooter?: () => React.ReactNode;
 }
 
 export function DataTableInfinite<TData, TValue, TMeta>({
@@ -141,18 +133,16 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   totalRows = 0,
   filterRows = 0,
   totalRowsFetched = 0,
-  chartData = [],
-  chartDataColumnId,
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
   meta,
   renderLiveRow,
   renderSheetTitle,
+  renderChart,
+  renderActions,
+  renderSidebarFooter,
   schema,
   tableId = "infinite",
-  showConfigurationDropdown = false,
-  adapterType = "nuqs",
-  prefetchEnabled = false,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>(defaultColumnFilters);
@@ -178,7 +168,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
       const onPageBottom =
         Math.ceil(e.currentTarget.scrollTop + e.currentTarget.clientHeight) >=
         e.currentTarget.scrollHeight;
-
       if (onPageBottom && !isFetching && totalRowsFetched < filterRows) {
         fetchNextPage();
       }
@@ -189,14 +178,10 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   React.useEffect(() => {
     const observer = new ResizeObserver(() => {
       const rect = topBarRef.current?.getBoundingClientRect();
-      if (rect) {
-        setTopBarHeight(rect.height);
-      }
+      if (rect) setTopBarHeight(rect.height);
     });
-
     const topBar = topBarRef.current;
     if (!topBar) return;
-
     observer.observe(topBar);
     return () => observer.unobserve(topBar);
   }, [topBarRef]);
@@ -204,13 +189,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   const table = useReactTable({
     data,
     columns,
-    state: {
-      columnFilters,
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnOrder,
-    },
+    state: { columnFilters, sorting, columnVisibility, rowSelection, columnOrder },
     enableMultiRowSelection: false,
     columnResizeMode: "onChange",
     getRowId,
@@ -230,17 +209,12 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     meta: { getRowClassName },
   });
 
-  // NOTE: Filter, sort, and selection syncing is now handled by DataTableStoreSync
-
   const selectedRow = React.useMemo(() => {
     if ((isLoading || isFetching) && !data.length) return;
     const selectedRowKey = Object.keys(rowSelection)?.[0];
-    return table
-      .getCoreRowModel()
-      .flatRows.find((row) => row.id === selectedRowKey);
+    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey);
   }, [rowSelection, table, isLoading, isFetching, data]);
 
-  // Reset row selection if selected row is no longer in data
   React.useEffect(() => {
     if (isLoading || isFetching) return;
     if (Object.keys(rowSelection)?.length && !selectedRow) {
@@ -248,23 +222,13 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     }
   }, [rowSelection, selectedRow, isLoading, isFetching]);
 
-  /**
-   * https://tanstack.com/table/v8/docs/guide/column-sizing#advanced-column-resizing-performance
-   * Instead of calling `column.getSize()` on every render for every header
-   * and especially every data cell (very expensive),
-   * we will calculate all column sizes at once at the root table level in a useMemo
-   * and pass the column sizes down as CSS variables to the <table> element.
-   */
   const columnSizeVars = React.useMemo(() => {
     const headers = table.getFlatHeaders();
     const colSizes: { [key: string]: string } = {};
     for (let i = 0; i < headers.length; i++) {
       const header = headers[i]!;
-      // REMINDER: replace "." with "-" to avoid invalid CSS variable name (e.g. "timing.dns" -> "timing-dns")
-      colSizes[`--header-${header.id.replace(".", "-")}-size`] =
-        `${header.getSize()}px`;
-      colSizes[`--col-${header.column.id.replace(".", "-")}-size`] =
-        `${header.column.getSize()}px`;
+      colSizes[`--header-${header.id.replace(".", "-")}-size`] = `${header.getSize()}px`;
+      colSizes[`--col-${header.column.id.replace(".", "-")}-size`] = `${header.column.getSize()}px`;
     }
     return colSizes;
   }, [
@@ -278,20 +242,12 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     setColumnVisibility(defaultColumnVisibility);
   }, "u");
 
-  // Memoize column state as strings for efficient row memoization comparison
   const visibleColumnIds = React.useMemo(
-    () =>
-      table
-        .getVisibleLeafColumns()
-        .map((c) => c.id)
-        .join(","),
+    () => table.getVisibleLeafColumns().map((c) => c.id).join(","),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [table.getState().columnVisibility],
   );
-  const columnOrderString = React.useMemo(
-    () => columnOrder.join(","),
-    [columnOrder],
-  );
+  const columnOrderString = React.useMemo(() => columnOrder.join(","), [columnOrder]);
 
   return (
     <DataTableProvider
@@ -328,27 +284,22 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             <div className="flex h-[46px] items-center justify-between gap-3">
               <p className="px-2 font-medium text-foreground">Filters</p>
               <div>
-                {table.getState().columnFilters.length ? (
-                  <DataTableResetButton />
-                ) : null}
+                {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
               </div>
             </div>
           </div>
           <div className="flex-1 p-2 sm:overflow-y-scroll">
             <DataTableFilterControls />
           </div>
-          <div className="border-t border-border bg-background p-4 md:sticky md:bottom-0">
-            <SocialsFooter
-              showConfigurationDropdown={showConfigurationDropdown}
-              prefetchEnabled={prefetchEnabled}
-              adapterType={adapterType}
-            />
-          </div>
+          {renderSidebarFooter && (
+            <div className="border-t border-border bg-background p-4 md:sticky md:bottom-0">
+              {renderSidebarFooter()}
+            </div>
+          )}
         </div>
         <div
           className={cn(
             "flex max-w-full flex-1 flex-col border-border sm:border-l",
-            // Chrome issue
             "group-data-[expanded=true]/controls:sm:max-w-[calc(100vw_-_208px)] group-data-[expanded=true]/controls:md:max-w-[calc(100vw_-_288px)]",
           )}
         >
@@ -360,30 +311,13 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             )}
           >
             <DataTableFilterCommand schema={schema} tableId={tableId} />
-            {/* TBD: better flexibility with compound components? */}
-            <DataTableToolbar
-              renderActions={() => [
-                <RefreshButton key="refresh" onClick={refetch} />,
-                fetchPreviousPage ? (
-                  <LiveButton
-                    key="live"
-                    fetchPreviousPage={fetchPreviousPage}
-                  />
-                ) : null,
-              ]}
-            />
-            {/* TODO: move up to client component */}
-            <TimelineChart
-              data={chartData}
-              className="-mb-2"
-              columnId={chartDataColumnId}
-            />
+            <DataTableToolbar renderActions={renderActions} />
+            {renderChart?.()}
           </div>
           <div className="z-0">
             <Table
               ref={tableRef}
               onScroll={onScroll}
-              // REMINDER: https://stackoverflow.com/questions/50361698/border-style-do-not-work-with-sticky-position-element
               className="border-separate border-spacing-0"
               containerClassName="max-h-[calc(100vh_-_var(--top-bar-height))]"
             >
@@ -396,42 +330,37 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                       "[&>*]:border-t [&>:not(:last-child)]:border-r",
                     )}
                   >
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead
-                          key={header.id}
-                          className={cn(
-                            "relative select-none truncate border-b border-border [&>.cursor-col-resize]:last:opacity-0",
-                            header.column.columnDef.meta?.headerClassName,
-                          )}
-                          aria-sort={
-                            header.column.getIsSorted() === "asc"
-                              ? "ascending"
-                              : header.column.getIsSorted() === "desc"
-                                ? "descending"
-                                : "none"
-                          }
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                          {header.column.getCanResize() && (
-                            <div
-                              onDoubleClick={() => header.column.resetSize()}
-                              onMouseDown={header.getResizeHandler()}
-                              onTouchStart={header.getResizeHandler()}
-                              className={cn(
-                                "user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center",
-                                "before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border",
-                              )}
-                            />
-                          )}
-                        </TableHead>
-                      );
-                    })}
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        className={cn(
+                          "relative select-none truncate border-b border-border [&>.cursor-col-resize]:last:opacity-0",
+                          header.column.columnDef.meta?.headerClassName,
+                        )}
+                        aria-sort={
+                          header.column.getIsSorted() === "asc"
+                            ? "ascending"
+                            : header.column.getIsSorted() === "desc"
+                              ? "descending"
+                              : "none"
+                        }
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                        {header.column.getCanResize() && (
+                          <div
+                            onDoubleClick={() => header.column.resetSize()}
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                            className={cn(
+                              "user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center",
+                              "before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border",
+                            )}
+                          />
+                        )}
+                      </TableHead>
+                    ))}
                   </TableRow>
                 ))}
               </TableHeader>
@@ -439,14 +368,10 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                 id="content"
                 tabIndex={-1}
                 className="outline-1 -outline-offset-1 outline-primary transition-colors focus-visible:outline"
-                // REMINDER: avoids scroll (skipping the table header) when using skip to content
-                style={{
-                  scrollMarginTop: "calc(var(--top-bar-height) + 40px)",
-                }}
+                style={{ scrollMarginTop: "calc(var(--top-bar-height) + 40px)" }}
               >
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
                     <React.Fragment key={row.id}>
                       {renderLiveRow?.({ row })}
                       <MemoizedRow
@@ -462,10 +387,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                   <React.Fragment>
                     {renderLiveRow?.()}
                     <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
-                      >
+                      <TableCell colSpan={columns.length} className="h-24 text-center">
                         No results.
                       </TableCell>
                     </TableRow>
@@ -514,13 +436,10 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           data={selectedRow?.original}
           filterFields={filterFields}
           fields={sheetFields}
-          // TODO: check if we should memoize this
-          // REMINDER: this is used to pass additional data like the `InfiniteQueryMeta`
           metadata={{
             totalRows,
             filterRows,
             totalRowsFetched,
-            // REMINDER: includes `currentPercentiles`
             ...meta,
           }}
         />
@@ -528,12 +447,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     </DataTableProvider>
   );
 }
-
-/**
- * REMINDER: this is the heaviest component in the table if lots of rows
- * Some other components are rendered more often necessary, but are fixed size (not like rows that can grow in height)
- * e.g. DataTableFilterControls, DataTableFilterCommand, DataTableToolbar, DataTableHeader
- */
 
 function Row<TData>({
   row,
@@ -544,15 +457,11 @@ function Row<TData>({
 }: {
   row: Row<TData>;
   table: TTable<TData>;
-  // REMINDER: row.getIsSelected(); - just for memoization
   selected?: boolean;
-  // REMINDER: for memoization - triggers re-render when columns change
   visibleColumnIds: string;
   columnOrder: string;
 }) {
-  // REMINDER: rerender the row when live mode is toggled - used to opacity the row
-  // via the `getRowClassName` prop - but for some reasons it wil render the row on data fetch
-  useFilterState((s) => s.live);
+  useFilterState((s: Record<string, unknown>) => s.live);
   return (
     <TableRow
       id={row.id}

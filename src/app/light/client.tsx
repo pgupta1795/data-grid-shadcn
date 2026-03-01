@@ -4,13 +4,14 @@ import { getLevelRowClassName } from "@/lib/request/level";
 import { DataTableStoreProvider, useFilterState } from "@/lib/store";
 import { useNuqsAdapter } from "@/lib/store/adapters/nuqs";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import type { Row } from "@tanstack/react-table";
 import * as React from "react";
 import {
   getFacetedMinMaxValues,
   getFacetedUniqueValues,
 } from "../infinite/client";
-import { DataTableInfinite } from "../infinite/data-table-infinite";
-import { columns } from "./columns";
+import { DataTableInfinite } from "@/components/data-table/data-table-infinite";
+import { columns, type ColumnType } from "./columns";
 import { filterFields as defaultFilterFields, sheetFields } from "./constants";
 import { dataOptions } from "./query-options";
 import { filterSchema } from "./schema";
@@ -100,8 +101,8 @@ function ClientInner() {
       totalRowsFetched={totalFetched}
       defaultColumnFilters={defaultColumnFilters}
       defaultColumnSorting={sort ? [sort] : undefined}
-      getRowClassName={(row) => getLevelRowClassName(row.original.level)}
-      getRowId={(row) =>
+      getRowClassName={(row: Row<ColumnType>) => getLevelRowClassName(row.original.level)}
+      getRowId={(row: ColumnType) =>
         `${row.region}-${row.timestamp}-${row.url}-${row.latency}`
       }
       meta={metadata}
@@ -118,7 +119,7 @@ function ClientInner() {
       // NOTE: we are not using live mode
       fetchPreviousPage={undefined}
       refetch={refetch}
-      renderSheetTitle={(props) => props.row?.original.url}
+      renderSheetTitle={(props: { row?: Row<ColumnType> }) => props.row?.original.url}
       schema={filterSchema.definition}
       tableId="light"
     />

@@ -17,23 +17,25 @@ import { DataTableFilterControls } from "@/components/data-table/data-table-filt
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { DataTableProvider } from "@/components/data-table/data-table-provider";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
-import type { DataTableFilterField } from "@/components/data-table/types";
+import type { DataTableFilterField, SheetField } from "@/components/data-table/types";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { getColumnVisibilityKey } from "@/lib/constants/local-storage";
+import type { SchemaDefinition } from "@/lib/store/schema/types";
 import { cn } from "@/lib/utils";
 import type {
   ColumnDef,
   ColumnFiltersState,
-  ExpandedState,
   PaginationState,
+  Row,
+  RowSelectionState,
   SortingState,
+  TableOptions,
   Table as TTable,
   VisibilityState,
 } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
-  getExpandedRowModel,
   getFacetedMinMaxValues,
   getFacetedRowModel,
   getFacetedUniqueValues,
@@ -42,56 +44,115 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import type { FetchNextPageOptions, FetchPreviousPageOptions, RefetchOptions } from "@tanstack/react-query";
 import * as React from "react";
-import { filterSchema } from "./schema";
-import type { TreeNode } from "./types";
 
-export interface DataTableProps {
-  columns: ColumnDef<TreeNode>[];
-  data: TreeNode[];
+export interface DataTableProps<TData, TValue> {
+  // ── Core ──────────────────────────────────────────────────────────────────
+  data: TData[];
+  columns: ColumnDef<TData, TValue>[];
+  filterFields?: DataTableFilterField<TData>[];
+  // BYOS — required so component is not coupled to a specific schema
+  schema: SchemaDefinition;
+  tableId: string;
+
+  // ── State defaults ────────────────────────────────────────────────────────
   defaultColumnFilters?: ColumnFiltersState;
-  filterFields?: DataTableFilterField<TreeNode>[];
-  tableId?: string;
+  defaultSorting?: SortingState;
+  defaultColumnVisibility?: VisibilityState;
+  defaultRowSelection?: RowSelectionState;
+  defaultPagination?: PaginationState;
+
+  // ── Row behaviour ─────────────────────────────────────────────────────────
+  getRowId?: TableOptions<TData>["getRowId"];
+  getRowClassName?: (row: Row<TData>) => string;
+
+  // ── Server-side facets ────────────────────────────────────────────────────
+  getFacetedUniqueValues?: (
+    table: TTable<TData>,
+    columnId: string,
+  ) => Map<string, number>;
+  getFacetedMinMaxValues?: (
+    table: TTable<TData>,
+    columnId: string,
+  ) => [number, number] | undefined;
+
+  // ── Column features ───────────────────────────────────────────────────────
+  enableColumnOrdering?: boolean;
+  enableColumnResizing?: boolean;
+
+  // ── Loading / fetch state ─────────────────────────────────────────────────
+  isLoading?: boolean;
+  isFetching?: boolean;
+  totalRows?: number;
+  filterRows?: number;
+  totalRowsFetched?: number;
+
+  // ── Infinite scroll (optional — use DataTableInfinite for full support) ───
+  hasNextPage?: boolean;
+  fetchNextPage?: (options?: FetchNextPageOptions) => Promise<unknown>;
+  fetchPreviousPage?: (options?: FetchPreviousPageOptions) => Promise<unknown>;
+  refetch?: (options?: RefetchOptions) => void;
+
+  // ── Sheet / detail panel ──────────────────────────────────────────────────
+  sheetFields?: SheetField<TData>[];
+  renderSheetTitle?: (props: { row?: Row<TData> }) => React.ReactNode;
+
+  // ── Render slots ──────────────────────────────────────────────────────────
+  /** Passed to DataTableToolbar — renders after the reset button and before view options */
+  renderActions?: () => React.ReactNode;
+  /** Renders below the toolbar, above the table (e.g. a chart) */
+  renderChart?: () => React.ReactNode;
+  /** Renders at the bottom of the sidebar (e.g. a footer) */
+  renderSidebarFooter?: () => React.ReactNode;
 }
 
-export function DataTable({
+export function DataTable<TData, TValue>({
   columns,
   data,
   defaultColumnFilters = [],
+  defaultSorting = [],
+  defaultColumnVisibility = {},
+  defaultPagination = { pageIndex: 0, pageSize: 10 },
   filterFields = [],
-  tableId = "tree",
-}: DataTableProps) {
+  getFacetedUniqueValues: externalGetFacetedUniqueValues,
+  getFacetedMinMaxValues: externalGetFacetedMinMaxValues,
+  isLoading,
+  schema,
+  tableId,
+  renderActions,
+  renderChart,
+  renderSidebarFooter,
+}: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>(defaultColumnFilters);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [pagination, setPagination] = React.useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [expanded, setExpanded] = React.useState<ExpandedState>({});
+  const [sorting, setSorting] =
+    React.useState<SortingState>(defaultSorting);
+  const [pagination, setPagination] =
+    React.useState<PaginationState>(defaultPagination);
   const [columnVisibility, setColumnVisibility] =
-    useLocalStorage<VisibilityState>(getColumnVisibilityKey(tableId), {});
+    useLocalStorage<VisibilityState>(
+      getColumnVisibilityKey(tableId),
+      defaultColumnVisibility,
+    );
 
-  // Reset pagination to page 0 when filters change
+  // Reset pagination when filters change to avoid showing empty pages
   React.useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   }, [columnFilters]);
 
-  // Custom getFacetedUniqueValues that handles array values
-  // (same implementation as default/data-table.tsx)
+  // Custom getFacetedUniqueValues that handles array column values
   const customGetFacetedUniqueValues = React.useCallback(
-    (table: TTable<TreeNode>, columnId: string) => () => {
-      const facets = getFacetedUniqueValues<TreeNode>()(table, columnId)();
+    (table: TTable<TData>, columnId: string) => () => {
+      const facets = getFacetedUniqueValues<TData>()(table, columnId)();
       const customFacets = new Map();
       for (const [key, value] of facets as Map<unknown, number>) {
         if (Array.isArray(key)) {
           for (const k of key) {
-            const prevValue = customFacets.get(k) || 0;
-            customFacets.set(k, prevValue + value);
+            customFacets.set(k, (customFacets.get(k) || 0) + value);
           }
         } else {
-          const prevValue = customFacets.get(key) || 0;
-          customFacets.set(key, prevValue + value);
+          customFacets.set(key, (customFacets.get(key) || 0) + value);
         }
       }
       return customFacets;
@@ -102,26 +163,11 @@ export function DataTable({
   const table = useReactTable({
     data,
     columns,
-    state: {
-      columnFilters,
-      sorting,
-      columnVisibility,
-      pagination,
-      expanded,
-    },
+    state: { columnFilters, sorting, columnVisibility, pagination },
     onColumnVisibilityChange: setColumnVisibility,
     onColumnFiltersChange: setColumnFilters,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
-    onExpandedChange: setExpanded,
-    // ── Tree-specific options ──────────────────────────────────────────────
-    // Tell TanStack where to find each row's children
-    getSubRows: (row) => row.children,
-    // Keep ancestor rows visible when any descendant matches a filter
-    filterFromLeafRows: true,
-    // Enable the expand/collapse row model
-    getExpandedRowModel: getExpandedRowModel(),
-    // ── Standard row models (unchanged from default route) ─────────────────
     getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -133,12 +179,16 @@ export function DataTable({
     enableColumnFilters: true,
   });
 
-  // Wrap signature for DataTableProvider (needs Map<string,number>, not function)
+  // Adapter signature for DataTableProvider
   const getFacetedUniqueValuesForProvider = React.useCallback(
-    (table: TTable<TreeNode>, columnId: string): Map<string, number> => {
+    (table: TTable<TData>, columnId: string): Map<string, number> => {
+      // Prefer externally-provided (server-side) facets over computed ones
+      if (externalGetFacetedUniqueValues) {
+        return externalGetFacetedUniqueValues(table, columnId);
+      }
       return customGetFacetedUniqueValues(table, columnId)();
     },
-    [customGetFacetedUniqueValues],
+    [customGetFacetedUniqueValues, externalGetFacetedUniqueValues],
   );
 
   return (
@@ -149,7 +199,9 @@ export function DataTable({
       columnFilters={columnFilters}
       sorting={sorting}
       pagination={pagination}
+      isLoading={isLoading}
       getFacetedUniqueValues={getFacetedUniqueValuesForProvider}
+      getFacetedMinMaxValues={externalGetFacetedMinMaxValues}
     >
       <div className="flex h-full w-full flex-col gap-3 sm:flex-row">
         <div
@@ -159,13 +211,12 @@ export function DataTable({
           )}
         >
           <DataTableFilterControls />
+          {renderSidebarFooter?.()}
         </div>
         <div className="flex max-w-full flex-1 flex-col gap-4 overflow-hidden p-1">
-          <DataTableFilterCommand
-            schema={filterSchema.definition}
-            tableId="tree"
-          />
-          <DataTableToolbar />
+          <DataTableFilterCommand schema={schema} tableId={tableId} />
+          {renderChart?.()}
+          <DataTableToolbar renderActions={renderActions} />
           <div className="rounded-md border">
             <Table>
               <TableHeader className="bg-muted/50">
