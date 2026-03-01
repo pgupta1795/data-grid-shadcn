@@ -1,0 +1,197 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "data-table-filters",
+  "items": [
+    {
+      "name": "data-table",
+      "type": "registry:block",
+      "title": "Data Table with Filters",
+      "description": "Advanced data table with filtering (input, checkbox, slider, timerange), sorting, pagination, column visibility, command palette, and BYOS state management (nuqs URL state or Zustand client state).",
+      "dependencies": [
+        "@tanstack/react-table",
+        "@tanstack/react-query",
+        "nuqs",
+        "zustand",
+        "date-fns",
+        "cmdk",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "table",
+        "badge",
+        "button",
+        "checkbox",
+        "accordion",
+        "command",
+        "popover",
+        "slider",
+        "calendar",
+        "input",
+        "separator",
+        "sheet",
+        "skeleton",
+        "tooltip",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "src/components/data-table/data-table-provider.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-toolbar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-pagination.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-filter-controls.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-filter-command/index.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-filter-command/utils.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-view-options.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-column-header.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-skeleton.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-filter-checkbox.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-filter-input.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-filter-slider.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-filter-timerange.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/data-table-reset-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/data-table/types.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/lib/store/index.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/schema/field.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/schema/index.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/schema/serialization.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/schema/types.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/adapters/nuqs/index.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/adapters/zustand/index.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/adapters/zustand/slice.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/provider/DataTableStoreProvider.tsx",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/hooks/useFilterState.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/store/hooks/useFilterActions.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/lib/is-array.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "data-table-tree",
+      "type": "registry:block",
+      "title": "Data Table Tree View",
+      "description": "Tree/hierarchical data support for Data Table. Inline expand/collapse with depth-based indentation, ancestor-preserving filters (filterFromLeafRows), all filter types (input, checkbox, slider, timerange), sorting, pagination of visible rows.",
+      "registryDependencies": ["data-table"],
+      "files": [
+        {
+          "path": "src/app/tree/types.ts",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/data.ts",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/schema.ts",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/store.ts",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/constants.tsx",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/columns.tsx",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/data-table.tsx",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/client.tsx",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/page.tsx",
+          "type": "registry:example"
+        },
+        {
+          "path": "src/app/tree/layout.tsx",
+          "type": "registry:example"
+        }
+      ]
+    }
+  ]
+}
