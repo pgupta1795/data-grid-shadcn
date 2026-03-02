@@ -6,17 +6,17 @@
 
 "use client";
 
-import { useCallback, useMemo } from "react";
-import { useStoreContext } from "../context";
+import {useStoreContext} from "@/lib/store/context";
+import {useCallback,useMemo} from "react";
 
 /**
  * Actions returned by useFilterActions
  */
-export interface FilterActions<T extends Record<string, unknown>> {
+export interface FilterActions<T extends Record<string,unknown>> {
   /**
    * Set a single filter field value
    */
-  setFilter: <K extends keyof T>(key: K, value: T[K]) => void;
+  setFilter: <K extends keyof T>(key: K,value: T[K]) => void;
 
   /**
    * Set multiple filter fields at once
@@ -70,10 +70,8 @@ export interface FilterActions<T extends Record<string, unknown>> {
  * resume();
  * ```
  */
-export function useFilterActions<
-  T extends Record<string, unknown>,
->(): FilterActions<T> {
-  const context = useStoreContext();
+export function useFilterActions<T extends Record<string,unknown>>(): FilterActions<T> {
+  const context=useStoreContext();
 
   if (!context) {
     throw new Error(
@@ -81,44 +79,44 @@ export function useFilterActions<
     );
   }
 
-  const { adapter } = context;
+  const {adapter}=context;
 
-  const setFilter = useCallback(
-    <K extends keyof T>(key: K, value: T[K]) => {
-      adapter.setField(key as string, value);
+  const setFilter=useCallback(
+    <K extends keyof T>(key: K,value: T[K]) => {
+      adapter.setField(key as string,value);
     },
     [adapter],
   );
 
-  const setFilters = useCallback(
+  const setFilters=useCallback(
     (partial: Partial<T>) => {
-      adapter.setState(partial as Partial<Record<string, unknown>>);
+      adapter.setState(partial as Partial<Record<string,unknown>>);
     },
     [adapter],
   );
 
-  const resetFilter = useCallback(
+  const resetFilter=useCallback(
     (key: keyof T) => {
       adapter.reset([key as string]);
     },
     [adapter],
   );
 
-  const resetAllFilters = useCallback(() => {
+  const resetAllFilters=useCallback(() => {
     adapter.reset();
-  }, [adapter]);
+  },[adapter]);
 
-  const pause = useCallback(() => {
+  const pause=useCallback(() => {
     adapter.pause();
-  }, [adapter]);
+  },[adapter]);
 
-  const resume = useCallback(() => {
+  const resume=useCallback(() => {
     adapter.resume();
-  }, [adapter]);
+  },[adapter]);
 
-  const isPaused = useCallback(() => {
+  const isPaused=useCallback(() => {
     return adapter.isPaused();
-  }, [adapter]);
+  },[adapter]);
 
   return useMemo(
     () => ({

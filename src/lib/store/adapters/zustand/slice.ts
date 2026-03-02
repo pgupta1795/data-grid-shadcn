@@ -4,9 +4,9 @@
  * Creates a namespaced slice for filter state that can be added to existing Zustand stores.
  */
 
-import { getSchemaDefaults } from "../../schema/serialization";
-import type { SchemaDefinition } from "../../schema/types";
-import type { FilterSlice } from "./types";
+import type {SchemaDefinition} from "../../schema/schemaTypes";
+import {getSchemaDefaults} from "../../schema/serialization";
+import type {FilterSlice} from "./types";
 
 /**
  * Create state keys for a filter slice (namespaced by table ID)
@@ -26,7 +26,7 @@ export function getFilterSliceKeys(tableId: string) {
 /**
  * Type helper for getting the slice keys type
  */
-export type FilterSliceKeys = ReturnType<typeof getFilterSliceKeys>;
+export type FilterSliceKeys=ReturnType<typeof getFilterSliceKeys>;
 
 /**
  * Create a filter slice for a Zustand store
@@ -51,20 +51,20 @@ export type FilterSliceKeys = ReturnType<typeof getFilterSliceKeys>;
  * }));
  * ```
  */
-export function createFilterSlice<T extends Record<string, unknown>>(
+export function createFilterSlice<T extends Record<string,unknown>>(
   schema: SchemaDefinition,
   tableId: string,
   set: (
     partial:
-      | Record<string, unknown>
-      | ((state: Record<string, unknown>) => Record<string, unknown>),
+      |Record<string,unknown>
+      |((state: Record<string,unknown>) => Record<string,unknown>),
   ) => void,
-  get: () => Record<string, unknown>,
+  get: () => Record<string,unknown>,
   initialState?: Partial<T>,
-): Record<string, unknown> {
-  const keys = getFilterSliceKeys(tableId);
-  const defaults = getSchemaDefaults(schema) as T;
-  const initial = { ...defaults, ...initialState };
+): Record<string,unknown> {
+  const keys=getFilterSliceKeys(tableId);
+  const defaults=getSchemaDefaults(schema) as T;
+  const initial={...defaults,...initialState};
 
   return {
     // State
@@ -74,47 +74,47 @@ export function createFilterSlice<T extends Record<string, unknown>>(
 
     // Actions
     [keys.setFilters]: (partial: Partial<T>) => {
-      const state = get();
-      const isPaused = state[keys.paused] as boolean;
+      const state=get();
+      const isPaused=state[keys.paused] as boolean;
 
       if (isPaused) {
-        const pending = (state[keys.pending] as Partial<T> | null) || {};
-        set({ [keys.pending]: { ...pending, ...partial } });
+        const pending=(state[keys.pending] as Partial<T>|null)||{};
+        set({[keys.pending]: {...pending,...partial}});
         return;
       }
 
-      const current = state[keys.state] as T;
-      set({ [keys.state]: { ...current, ...partial } });
+      const current=state[keys.state] as T;
+      set({[keys.state]: {...current,...partial}});
     },
 
     [keys.resetFilters]: (fields?: (keyof T)[]) => {
-      const state = get();
-      const current = state[keys.state] as T;
+      const state=get();
+      const current=state[keys.state] as T;
 
       if (fields) {
-        const resetPartial: Partial<T> = {};
+        const resetPartial: Partial<T>={};
         for (const field of fields) {
-          resetPartial[field] = defaults[field];
+          resetPartial[field]=defaults[field];
         }
-        set({ [keys.state]: { ...current, ...resetPartial } });
+        set({[keys.state]: {...current,...resetPartial}});
       } else {
-        set({ [keys.state]: defaults });
+        set({[keys.state]: defaults});
       }
     },
 
     [keys.pauseFilters]: () => {
-      set({ [keys.paused]: true });
+      set({[keys.paused]: true});
     },
 
     [keys.resumeFilters]: () => {
-      const state = get();
-      const pending = state[keys.pending] as Partial<T> | null;
+      const state=get();
+      const pending=state[keys.pending] as Partial<T>|null;
 
-      set({ [keys.paused]: false, [keys.pending]: null });
+      set({[keys.paused]: false,[keys.pending]: null});
 
       if (pending) {
-        const current = state[keys.state] as T;
-        set({ [keys.state]: { ...current, ...pending } });
+        const current=state[keys.state] as T;
+        set({[keys.state]: {...current,...pending}});
       }
     },
   };
@@ -123,11 +123,11 @@ export function createFilterSlice<T extends Record<string, unknown>>(
 /**
  * Get filter slice from a Zustand store state
  */
-export function getFilterSliceFromState<T extends Record<string, unknown>>(
-  state: Record<string, unknown>,
+export function getFilterSliceFromState<T extends Record<string,unknown>>(
+  state: Record<string,unknown>,
   tableId: string,
-): FilterSlice<T> | null {
-  const keys = getFilterSliceKeys(tableId);
+): FilterSlice<T>|null {
+  const keys=getFilterSliceKeys(tableId);
 
   if (!(keys.state in state)) {
     return null;
@@ -136,7 +136,7 @@ export function getFilterSliceFromState<T extends Record<string, unknown>>(
   return {
     filters: state[keys.state] as T,
     filtersPaused: state[keys.paused] as boolean,
-    filtersPending: state[keys.pending] as Partial<T> | null,
+    filtersPending: state[keys.pending] as Partial<T>|null,
     setFilters: state[keys.setFilters] as (partial: Partial<T>) => void,
     resetFilters: state[keys.resetFilters] as (fields?: (keyof T)[]) => void,
     pauseFilters: state[keys.pauseFilters] as () => void,

@@ -1,3 +1,4 @@
+import {Skeleton as DefaultSkeleton} from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -5,12 +6,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/custom/table";
-import { Skeleton as DefaultSkeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/table";
+import {cn} from "@/lib/utils";
 
-const chartBarsHeights = Array.from({ length: 40 }).map(
-  () => Math.random() * 30 + 15,
+const chartBarsHeights=Array.from({length: 40}).map(
+  () => Math.random()*30+15,
 );
 
 export function Skeleton() {
@@ -55,7 +55,7 @@ export function Skeleton() {
             </div>
 
             {/* Other Filters */}
-            {Array.from({ length: 9 }).map((_, i) => (
+            {Array.from({length: 9}).map((_,i) => (
               <div key={i} className="space-y-2">
                 <DefaultSkeleton className="h-4 w-24" />
                 <DefaultSkeleton className="h-9 w-full" />
@@ -108,11 +108,11 @@ export function Skeleton() {
             <div className="relative h-full">
               {/* Chart bars area - positioned at top */}
               <div className="absolute inset-x-0 top-0 flex h-[45px] items-end gap-[1px]">
-                {chartBarsHeights.map((height, i) => (
+                {chartBarsHeights.map((height,i) => (
                   <DefaultSkeleton
                     key={i}
                     className="flex-1 rounded-sm"
-                    style={{ height: `${height}%` }}
+                    style={{height: `${height}%`}}
                   />
                 ))}
               </div>
@@ -178,7 +178,7 @@ export function Skeleton() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {Array.from({ length: 24 }).map((_, i) => (
+              {Array.from({length: 24}).map((_,i) => (
                 <TableRow
                   key={i}
                   className="hover:bg-transparent [&>*]:border-b [&>:not(:last-child)]:border-r"

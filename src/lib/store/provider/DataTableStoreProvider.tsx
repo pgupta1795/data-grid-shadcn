@@ -6,12 +6,12 @@
 
 "use client";
 
-import React, { useEffect, useMemo } from "react";
-import type { StoreAdapter } from "../adapter/types";
-import { StoreContext, type StoreContextValue } from "../context";
+import React,{useEffect,useMemo} from "react";
+import type {StoreAdapter} from "../adapter/adapterTypes";
+import {StoreContext,type StoreContextValue} from "../context";
 
 export interface DataTableStoreProviderProps<
-  T extends Record<string, unknown>,
+  T extends Record<string,unknown>,
 > {
   /**
    * The store adapter to use
@@ -38,11 +38,11 @@ export interface DataTableStoreProviderProps<
  * );
  * ```
  */
-export function DataTableStoreProvider<T extends Record<string, unknown>>({
+export function DataTableStoreProvider<T extends Record<string,unknown>>({
   adapter,
   children,
 }: DataTableStoreProviderProps<T>) {
-  const value = useMemo<StoreContextValue<T>>(
+  const value=useMemo<StoreContextValue<T>>(
     () => ({
       adapter,
       schema: adapter.getSchema(),
@@ -56,11 +56,11 @@ export function DataTableStoreProvider<T extends Record<string, unknown>>({
     return () => {
       adapter.destroy();
     };
-  }, [adapter]);
+  },[adapter]);
 
   return (
     <StoreContext.Provider
-      value={value as StoreContextValue<Record<string, unknown>>}
+      value={value as StoreContextValue<Record<string,unknown>>}
     >
       {children}
     </StoreContext.Provider>

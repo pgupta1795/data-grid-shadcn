@@ -3,9 +3,10 @@ import {
   RANGE_DELIMITER,
   SLIDER_DELIMITER,
 } from "@/lib/delimiters";
-import { createSchema, field } from "@/lib/store/schema";
-import type { SchemaDefinition } from "@/lib/store/schema";
-import type { TableSchemaDefinition } from "../types";
+import {field} from "@/lib/store/schema/field";
+import {createSchema} from "@/lib/store/schema/schema";
+import type {SchemaDefinition} from "@/lib/store/schema/schemaTypes";
+import type {TableSchemaDefinition} from "../types";
 
 /**
  * Generate a BYOS filter schema from a table schema definition.
@@ -35,55 +36,55 @@ import type { TableSchemaDefinition } from "../types";
 export function generateFilterSchema(
   schema: TableSchemaDefinition,
 ): ReturnType<typeof createSchema<SchemaDefinition>> {
-  const definition: SchemaDefinition = {};
+  const definition: SchemaDefinition={};
 
-  for (const [key, builder] of Object.entries(schema)) {
-    const config = builder._config;
+  for (const [key,builder] of Object.entries(schema)) {
+    const config=builder._config;
     if (!config.filter) continue;
 
-    const { kind, filter, enumValues, arrayItem } = config;
+    const {kind,filter,enumValues,arrayItem}=config;
 
     switch (filter.type) {
       case "input": {
-        if (kind === "string") {
-          definition[key] = field.string();
-        } else if (kind === "number") {
-          definition[key] = field.number();
+        if (kind==="string") {
+          definition[key]=field.string();
+        } else if (kind==="number") {
+          definition[key]=field.number();
         }
         break;
       }
       case "checkbox": {
-        if (kind === "enum" && enumValues) {
-          definition[key] = field.array(
+        if (kind==="enum"&&enumValues) {
+          definition[key]=field.array(
             field.stringLiteral(enumValues as readonly string[]),
           );
-        } else if (kind === "number") {
-          definition[key] = field
+        } else if (kind==="number") {
+          definition[key]=field
             .array(field.number())
             .delimiter(ARRAY_DELIMITER);
-        } else if (kind === "boolean") {
-          definition[key] = field
+        } else if (kind==="boolean") {
+          definition[key]=field
             .array(field.boolean())
             .delimiter(ARRAY_DELIMITER);
         } else if (
-          kind === "array" &&
-          arrayItem?.kind === "enum" &&
+          kind==="array"&&
+          arrayItem?.kind==="enum"&&
           arrayItem.enumValues
         ) {
-          definition[key] = field.array(
+          definition[key]=field.array(
             field.stringLiteral(arrayItem.enumValues as readonly string[]),
           );
         }
         break;
       }
       case "slider": {
-        definition[key] = field
+        definition[key]=field
           .array(field.number())
           .delimiter(SLIDER_DELIMITER);
         break;
       }
       case "timerange": {
-        definition[key] = field
+        definition[key]=field
           .array(field.timestamp())
           .delimiter(RANGE_DELIMITER);
         break;

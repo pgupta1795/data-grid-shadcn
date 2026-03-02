@@ -30,17 +30,17 @@ import {
   createSerializer,
   type ParserBuilder,
 } from "nuqs/server";
-import type { SchemaDefinition } from "../../schema/types";
-import { schemaToNuqsParsers, type SchemaToNuqsParsers } from "./parser-bridge";
+import type {SchemaDefinition} from "../../schema/schemaTypes";
+import {schemaToNuqsParsers,type SchemaToNuqsParsers} from "./parser-bridge";
 
-export type { SchemaToNuqsParsers } from "./parser-bridge";
+export type {SchemaToNuqsParsers} from "./parser-bridge";
 
 /**
  * Options for creating nuqs search params utilities
  */
 export interface CreateNuqsSearchParamsOptions<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TExtra extends Record<string, ParserBuilder<any>> = {},
+  TExtra extends Record<string,ParserBuilder<any>>={},
 > {
   /**
    * Additional parsers to include (e.g., pagination params)
@@ -54,25 +54,25 @@ export interface CreateNuqsSearchParamsOptions<
 export interface NuqsSearchParamsResult<
   TSchema extends SchemaDefinition,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TExtra extends Record<string, ParserBuilder<any>> = {},
+  TExtra extends Record<string,ParserBuilder<any>>={},
 > {
   /**
    * Combined parser object for useQueryStates
    */
-  searchParamsParser: SchemaToNuqsParsers<TSchema> & TExtra;
+  searchParamsParser: SchemaToNuqsParsers<TSchema>&TExtra;
 
   /**
    * Search params cache for server-side parsing
    */
   searchParamsCache: ReturnType<
-    typeof createSearchParamsCache<SchemaToNuqsParsers<TSchema> & TExtra>
+    typeof createSearchParamsCache<SchemaToNuqsParsers<TSchema>&TExtra>
   >;
 
   /**
    * Serializer for converting state to URL string
    */
   searchParamsSerializer: ReturnType<
-    typeof createSerializer<SchemaToNuqsParsers<TSchema> & TExtra>
+    typeof createSerializer<SchemaToNuqsParsers<TSchema>&TExtra>
   >;
 }
 
@@ -103,25 +103,25 @@ export interface NuqsSearchParamsResult<
 export function createNuqsSearchParams<
   TSchema extends SchemaDefinition,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TExtra extends Record<string, ParserBuilder<any>> = {},
+  TExtra extends Record<string,ParserBuilder<any>>={},
 >(
   schema: TSchema,
-  options: CreateNuqsSearchParamsOptions<TExtra> = {},
-): NuqsSearchParamsResult<TSchema, TExtra> {
-  const { extraParsers = {} as TExtra } = options;
+  options: CreateNuqsSearchParamsOptions<TExtra>={},
+): NuqsSearchParamsResult<TSchema,TExtra> {
+  const {extraParsers={} as TExtra}=options;
 
   // Generate parsers from schema
-  const schemaParsers = schemaToNuqsParsers(schema);
+  const schemaParsers=schemaToNuqsParsers(schema);
 
   // Combine with extra parsers
-  const searchParamsParser = {
+  const searchParamsParser={
     ...schemaParsers,
     ...extraParsers,
-  } as SchemaToNuqsParsers<TSchema> & TExtra;
+  } as SchemaToNuqsParsers<TSchema>&TExtra;
 
   // Create cache and serializer
-  const searchParamsCache = createSearchParamsCache(searchParamsParser);
-  const searchParamsSerializer = createSerializer(searchParamsParser);
+  const searchParamsCache=createSearchParamsCache(searchParamsParser);
+  const searchParamsSerializer=createSerializer(searchParamsParser);
 
   return {
     searchParamsParser,
@@ -132,16 +132,14 @@ export function createNuqsSearchParams<
 
 // Re-export commonly used nuqs parsers for convenience
 export {
-  parseAsArrayOf,
+  createParser,parseAsArrayOf,
   parseAsBoolean,
   parseAsInteger,
   parseAsString,
   parseAsStringLiteral,
-  parseAsTimestamp,
-  createParser,
-  type ParserBuilder,
-  type inferParserType,
+  parseAsTimestamp,type inferParserType,type ParserBuilder
 } from "nuqs/server";
 
 // Re-export schema parser utilities
-export { schemaToNuqsParsers, createSchemaSerializer } from "./parser-bridge";
+export {createSchemaSerializer,schemaToNuqsParsers} from "./parser-bridge";
+

@@ -5,12 +5,12 @@
  * It is designed to be compatible with React 18's useSyncExternalStore.
  */
 
-import type { SchemaDefinition, StoreSnapshot } from "../schema/types";
+import type {SchemaDefinition,StoreSnapshot} from "../schema/schemaTypes";
 
 /**
  * Store adapter interface that all adapters must implement
  */
-export interface StoreAdapter<T extends Record<string, unknown>> {
+export interface StoreAdapter<T extends Record<string,unknown>> {
   /**
    * Subscribe to state changes.
    * Compatible with useSyncExternalStore's subscribe parameter.
@@ -50,7 +50,7 @@ export interface StoreAdapter<T extends Record<string, unknown>> {
    * @param key - Field key
    * @param value - New value
    */
-  setField<K extends keyof T>(key: K, value: T[K]): void;
+  setField<K extends keyof T>(key: K,value: T[K]): void;
 
   /**
    * Reset state to defaults.
@@ -100,7 +100,7 @@ export interface StoreAdapter<T extends Record<string, unknown>> {
 /**
  * Options for creating an adapter
  */
-export interface CreateAdapterOptions<T extends Record<string, unknown>> {
+export interface CreateAdapterOptions<T extends Record<string,unknown>> {
   /**
    * Unique ID for this table (required for multi-table support)
    */
@@ -115,7 +115,7 @@ export interface CreateAdapterOptions<T extends Record<string, unknown>> {
 /**
  * Factory function type for creating adapters
  */
-export type AdapterFactory<T extends Record<string, unknown>> = (
+export type AdapterFactory<T extends Record<string,unknown>>=(
   schema: SchemaDefinition,
   options: CreateAdapterOptions<T>,
 ) => StoreAdapter<T>;
@@ -123,13 +123,13 @@ export type AdapterFactory<T extends Record<string, unknown>> = (
 /**
  * Available adapter types
  */
-export type AdapterType = "nuqs" | "zustand";
+export type AdapterType="nuqs"|"zustand";
 
 /**
  * Internal adapter with additional methods for providers
  * @internal
  */
-export interface InternalStoreAdapter<T extends Record<string, unknown>>
+export interface InternalStoreAdapter<T extends Record<string,unknown>>
   extends StoreAdapter<T> {
   /**
    * Internal method to sync external state (used by nuqs adapter)
@@ -141,7 +141,7 @@ export interface InternalStoreAdapter<T extends Record<string, unknown>>
    * Internal method to get the state setter (used by nuqs adapter)
    * @internal
    */
-  _getStateSetter?(): ((partial: Partial<T>) => void) | null;
+  _getStateSetter?(): ((partial: Partial<T>) => void)|null;
 
   /**
    * Internal method to set the state setter (used by nuqs adapter)

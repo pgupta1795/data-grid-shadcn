@@ -41,51 +41,37 @@
  */
 
 // Schema
-export { createSchema, field } from "./schema";
+export {createSchema,field,getSchemaDefaults,isStateEqual,mergeWithDefaults,parseState,serializeState,stateToSearchString,validateState} from "./schema/schema";
 export type {
-  Schema,
-  SchemaDefinition,
-  InferSchemaType,
-  FieldBuilder,
-  FieldConfig,
-  StoreSnapshot,
-  AdapterOptions,
-} from "./schema";
-export {
-  getSchemaDefaults,
-  serializeState,
-  parseState,
-  validateState,
-  mergeWithDefaults,
-  isStateEqual,
-  stateToSearchString,
-} from "./schema";
+  AdapterOptions,FieldBuilder,
+  FieldConfig,InferSchemaType,Schema,
+  SchemaDefinition,StoreSnapshot
+} from "./schema/schema";
 
 // Adapter Interface
 export type {
-  StoreAdapter,
-  CreateAdapterOptions,
   AdapterFactory,
-  AdapterType,
-} from "./adapter";
+  AdapterType,CreateAdapterOptions,StoreAdapter
+} from "./adapter/adapterTypes";
 
 // Provider
-export { DataTableStoreProvider } from "./provider/DataTableStoreProvider";
-export type { DataTableStoreProviderProps } from "./provider/DataTableStoreProvider";
+export {DataTableStoreProvider} from "./provider/DataTableStoreProvider";
+export type {DataTableStoreProviderProps} from "./provider/DataTableStoreProvider";
 
 // Hooks
-export { useFilterState } from "./hooks/useFilterState";
-export { useFilterActions, type FilterActions } from "./hooks/useFilterActions";
-export { useFilterField, type FilterFieldResult } from "./hooks/useFilterField";
-export { useReactTableSync } from "./hooks/useReactTableSync";
+export {useFilterActions,type FilterActions} from "./hooks/useFilterActions";
+export {useFilterField,type FilterFieldResult} from "./hooks/useFilterField";
+export {useFilterState} from "./hooks/useFilterState";
+export {useReactTableSync} from "./hooks/useReactTableSync";
 
 // Context (for advanced use cases)
 export {
   StoreContext,
   useStoreContext,
-  type StoreContextValue,
+  type StoreContextValue
 } from "./context";
 
 // Text Parser
-export { createTextParser } from "./parser";
-export type { TextParser, TextParserOptions } from "./parser";
+export {createTextParser} from "./parser/text-parser";
+export type {TextParser,TextParserOptions} from "./parser/types";
+

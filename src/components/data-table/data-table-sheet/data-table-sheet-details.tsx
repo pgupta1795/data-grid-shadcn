@@ -1,6 +1,9 @@
 "use client";
 
-import { Kbd } from "@/components/custom/kbd";
+import {Kbd} from "@/components/custom/kbd";
+import {useDataTable} from "@/components/data-table/data-table-provider";
+import {Button} from "@/components/ui/button";
+import {Separator} from "@/components/ui/separator";
 import {
   Sheet,
   SheetClose,
@@ -8,19 +11,16 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/custom/sheet";
-import { useDataTable } from "@/components/data-table/data-table-provider";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/components/ui/sheet";
+import {Skeleton} from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import {cn} from "@/lib/utils";
+import {ChevronDown,ChevronUp,X} from "lucide-react";
 import * as React from "react";
 
 export interface DataTableSheetDetailsProps {
@@ -34,62 +34,62 @@ export function DataTableSheetDetails({
   titleClassName,
   children,
 }: DataTableSheetDetailsProps) {
-  const { table, rowSelection, isLoading } = useDataTable();
+  const {table,rowSelection,isLoading}=useDataTable();
 
-  const selectedRowKey = Object.keys(rowSelection)?.[0];
+  const selectedRowKey=Object.keys(rowSelection)?.[0];
 
-  const selectedRow = React.useMemo(() => {
-    if (isLoading && !selectedRowKey) return;
+  const selectedRow=React.useMemo(() => {
+    if (isLoading&&!selectedRowKey) return;
     return table
       .getCoreRowModel()
-      .flatRows.find((row) => row.id === selectedRowKey);
-  }, [selectedRowKey, isLoading, table]);
+      .flatRows.find((row) => row.id===selectedRowKey);
+  },[selectedRowKey,isLoading,table]);
 
-  const index = table
+  const index=table
     .getCoreRowModel()
-    .flatRows.findIndex((row) => row.id === selectedRow?.id);
+    .flatRows.findIndex((row) => row.id===selectedRow?.id);
 
-  const nextId = React.useMemo(
-    () => table.getCoreRowModel().flatRows[index + 1]?.id,
-    [index, isLoading, table],
+  const nextId=React.useMemo(
+    () => table.getCoreRowModel().flatRows[index+1]?.id,
+    [index,isLoading,table],
   );
 
-  const prevId = React.useMemo(
-    () => table.getCoreRowModel().flatRows[index - 1]?.id,
-    [index, isLoading, table],
+  const prevId=React.useMemo(
+    () => table.getCoreRowModel().flatRows[index-1]?.id,
+    [index,isLoading,table],
   );
 
-  const onPrev = React.useCallback(() => {
-    if (prevId) table.setRowSelection({ [prevId]: true });
-  }, [prevId, isLoading, table]);
+  const onPrev=React.useCallback(() => {
+    if (prevId) table.setRowSelection({[prevId]: true});
+  },[prevId,isLoading,table]);
 
-  const onNext = React.useCallback(() => {
-    if (nextId) table.setRowSelection({ [nextId]: true });
-  }, [nextId, isLoading, table]);
+  const onNext=React.useCallback(() => {
+    if (nextId) table.setRowSelection({[nextId]: true});
+  },[nextId,isLoading,table]);
 
   React.useEffect(() => {
-    const down = (e: KeyboardEvent) => {
+    const down=(e: KeyboardEvent) => {
       if (!selectedRowKey) return;
 
       // REMINDER: prevent dropdown navigation inside of sheet to change row selection
-      const activeElement = document.activeElement;
-      const isMenuActive = activeElement?.closest('[role="menu"]');
+      const activeElement=document.activeElement;
+      const isMenuActive=activeElement?.closest('[role="menu"]');
 
       if (isMenuActive) return;
 
-      if (e.key === "ArrowUp") {
+      if (e.key==="ArrowUp") {
         e.preventDefault();
         onPrev();
       }
-      if (e.key === "ArrowDown") {
+      if (e.key==="ArrowDown") {
         e.preventDefault();
         onNext();
       }
     };
 
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, [selectedRowKey, onNext, onPrev]);
+    document.addEventListener("keydown",down);
+    return () => document.removeEventListener("keydown",down);
+  },[selectedRowKey,onNext,onPrev]);
 
   return (
     <Sheet
@@ -97,33 +97,32 @@ export function DataTableSheetDetails({
       onOpenChange={() => {
         // REMINDER: focus back to the row that was selected
         // We need to manually focus back due to missing Trigger component
-        const el = selectedRowKey
+        const el=selectedRowKey
           ? document.getElementById(selectedRowKey)
-          : null;
+          :null;
         table.resetRowSelection();
 
         // REMINDER: when navigating between tabs in the sheet and exit the sheet, the tab gets lost
         // We need a minimal delay to allow the sheet to close before focusing back to the row
-        setTimeout(() => el?.focus(), 0);
+        setTimeout(() => el?.focus(),0);
       }}
     >
       <SheetContent
         // onCloseAutoFocus={(e) => e.preventDefault()}
         className="overflow-y-auto p-0 sm:max-w-md"
-        hideClose
       >
         <SheetHeader className="sticky top-0 z-10 border-b bg-background p-4">
           <div className="flex items-center justify-between gap-2">
-            <SheetTitle className={cn(titleClassName, "truncate text-left")}>
-              {isLoading && !selectedRowKey ? (
+            <SheetTitle className={cn(titleClassName,"truncate text-left")}>
+              {isLoading&&!selectedRowKey? (
                 <Skeleton className="h-7 w-36" />
-              ) : (
+              ):(
                 title
               )}
             </SheetTitle>
             <div className="flex h-7 items-center gap-1">
               <TooltipProvider>
-                <Tooltip delayDuration={100}>
+                <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       size="icon"
@@ -144,7 +143,7 @@ export function DataTableSheetDetails({
                 </Tooltip>
               </TooltipProvider>
               <TooltipProvider>
-                <Tooltip delayDuration={100}>
+                <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       size="icon"

@@ -1,5 +1,5 @@
-import { getSchemaDefaults } from "./serialization";
-import type { InferSchemaType, Schema, SchemaDefinition } from "./types";
+import type {Schema,SchemaDefinition} from "./schemaTypes";
+import {getSchemaDefaults} from "./serialization";
 
 /**
  * Schema System for BYOS (Bring Your Own Store)
@@ -21,24 +21,14 @@ import type { InferSchemaType, Schema, SchemaDefinition } from "./types";
  * ```
  */
 
-export { field } from "./field";
+export {field} from "./field";
 export type {
-  FieldBuilder,
-  FieldConfig,
-  SchemaDefinition,
-  InferSchemaType,
-  Schema,
-  StoreSnapshot,
-  AdapterOptions,
-} from "./types";
+  AdapterOptions,FieldBuilder,
+  FieldConfig,InferSchemaType,
+  Schema,SchemaDefinition,StoreSnapshot
+} from "./schemaTypes";
 export {
-  getSchemaDefaults,
-  serializeState,
-  parseState,
-  validateState,
-  mergeWithDefaults,
-  isStateEqual,
-  stateToSearchString,
+  getSchemaDefaults,isStateEqual,mergeWithDefaults,parseState,serializeState,stateToSearchString,validateState
 } from "./serialization";
 
 /**
@@ -59,7 +49,7 @@ export {
 export function createSchema<T extends SchemaDefinition>(
   definition: T,
 ): Schema<T> {
-  const defaults = getSchemaDefaults(definition);
+  const defaults=getSchemaDefaults(definition);
 
   return {
     definition,

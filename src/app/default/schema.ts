@@ -5,14 +5,14 @@
  * It coexists with search-params.ts for backward compatibility.
  */
 
-import { REGIONS } from "@/constants/region";
-import { TAGS } from "@/constants/tag";
-import { createSchema, field } from "@/lib/store/schema";
+import {REGIONS} from "@/constants/region";
+import {TAGS} from "@/constants/tag";
+import {createSchema,field} from "@/lib/store/schema/schema";
 
 /**
  * Filter schema for the default data table
  */
-export const filterSchema = createSchema({
+export const filterSchema=createSchema({
   // Text input filter
   url: field.string(),
   name: field.string(),
@@ -33,4 +33,4 @@ export const filterSchema = createSchema({
 /**
  * Inferred type from schema
  */
-export type FilterState = typeof filterSchema._type;
+export type FilterState=typeof filterSchema._type;

@@ -1,7 +1,7 @@
-import { TableCell, TableRow } from "@/components/custom/table";
-import { DataTableColumnLevelIndicator } from "@/components/data-table/data-table-column/data-table-column-level-indicator";
+import {DataTableColumnLevelIndicator} from "@/components/data-table/data-table-column/data-table-column-level-indicator";
+import {TableCell,TableRow} from "@/components/ui/table";
 
-export function LiveRow({ colSpan }: { colSpan: number }) {
+export function LiveRow({colSpan}: {colSpan: number}) {
   return (
     <TableRow>
       <TableCell className="w-[--header-level-size] min-w-[--header-level-size] max-w-[--header-level-size] border-b border-l border-r border-t border-info border-r-info/50">

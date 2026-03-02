@@ -4,28 +4,27 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import { TooltipPortal } from "@radix-ui/react-tooltip";
-import React, { useEffect, useRef, useState } from "react";
+import {cn} from "@/lib/utils";
+import {useEffect,useRef,useState} from "react";
 
 interface TextWithTooltipProps {
-  text: string | number;
+  text: string|number;
   className?: string;
 }
 
-export function TextWithTooltip({ text, className }: TextWithTooltipProps) {
-  const [isTruncated, setIsTruncated] = useState<boolean>(false);
-  const textRef = useRef<HTMLDivElement>(null);
+export function TextWithTooltip({text,className}: TextWithTooltipProps) {
+  const [isTruncated,setIsTruncated]=useState<boolean>(false);
+  const textRef=useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkTruncation = () => {
+    const checkTruncation=() => {
       if (textRef.current) {
-        const { scrollWidth, clientWidth } = textRef.current;
-        setIsTruncated(scrollWidth > clientWidth);
+        const {scrollWidth,clientWidth}=textRef.current;
+        setIsTruncated(scrollWidth>clientWidth);
       }
     };
 
-    const resizeObserver = new ResizeObserver(() => {
+    const resizeObserver=new ResizeObserver(() => {
       checkTruncation();
     });
 
@@ -38,26 +37,24 @@ export function TextWithTooltip({ text, className }: TextWithTooltipProps) {
     return () => {
       resizeObserver.disconnect();
     };
-  }, []);
+  },[]);
 
   return (
-    <TooltipProvider delayDuration={100} disableHoverableContent>
+    <TooltipProvider delayDuration={100} disableHoverableContent delay={100}>
       <Tooltip>
         <TooltipTrigger disabled={!isTruncated} asChild>
           <div
             ref={textRef}
             className={cn(
               "truncate",
-              !isTruncated && "pointer-events-none",
+              !isTruncated&&"pointer-events-none",
               className,
             )}
           >
             {text}
           </div>
         </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>{text}</TooltipContent>
-        </TooltipPortal>
+        <TooltipContent>{text}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

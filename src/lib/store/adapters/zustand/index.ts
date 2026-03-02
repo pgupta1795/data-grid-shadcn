@@ -7,25 +7,20 @@
 
 "use client";
 
-import { useMemo, useRef } from "react";
-import type { StoreApi } from "zustand";
-import type { InternalStoreAdapter } from "../../adapter/types";
-import { getSchemaDefaults } from "../../schema/serialization";
-import type { SchemaDefinition, StoreSnapshot } from "../../schema/types";
-import { getFilterSliceKeys } from "./slice";
-import type { ZustandAdapterOptions } from "./types";
+import {useMemo,useRef} from "react";
+import type {StoreApi} from "zustand";
+import type {InternalStoreAdapter} from "../../adapter/adapterTypes";
+import type {SchemaDefinition,StoreSnapshot} from "../../schema/schemaTypes";
+import {getSchemaDefaults} from "../../schema/serialization";
+import {getFilterSliceKeys} from "./slice";
+import type {ZustandAdapterOptions} from "./types";
 
-export type {
-  ZustandAdapterOptions,
-  FilterSlice,
-  FilterSliceState,
-  FilterSliceActions,
-} from "./types";
 export {
-  createFilterSlice,
-  getFilterSliceKeys,
-  getFilterSliceFromState,
+  createFilterSlice,getFilterSliceFromState,getFilterSliceKeys
 } from "./slice";
+export type {
+  FilterSlice,FilterSliceActions,FilterSliceState,ZustandAdapterOptions
+} from "./types";
 
 /**
  * Create a Zustand adapter from an existing store
@@ -58,36 +53,36 @@ export {
  * ```
  */
 export function useZustandAdapter<
-  TStore extends Record<string, unknown>,
-  TFilters extends Record<string, unknown>,
+  TStore extends Record<string,unknown>,
+  TFilters extends Record<string,unknown>,
 >(
   useStore: {
     (): TStore;
     getState: () => TStore;
     subscribe: (
-      listener: (state: TStore, prevState: TStore) => void,
+      listener: (state: TStore,prevState: TStore) => void,
     ) => () => void;
   },
   schema: SchemaDefinition,
   options: ZustandAdapterOptions<TFilters>,
 ): InternalStoreAdapter<TFilters> {
-  const { id, initialState } = options;
-  const keys = getFilterSliceKeys(id);
-  const defaults = useMemo(
+  const {id,initialState}=options;
+  const keys=getFilterSliceKeys(id);
+  const defaults=useMemo(
     () => getSchemaDefaults(schema) as TFilters,
     [schema],
   );
 
-  const versionRef = useRef(0);
+  const versionRef=useRef(0);
 
   // Cache server snapshot to avoid infinite loop with useSyncExternalStore
-  const serverSnapshotRef = useRef<StoreSnapshot<TFilters>>({
-    state: { ...defaults, ...initialState } as TFilters,
+  const serverSnapshotRef=useRef<StoreSnapshot<TFilters>>({
+    state: {...defaults,...initialState} as TFilters,
     version: 0,
   });
 
-  const adapter = useMemo<InternalStoreAdapter<TFilters>>(() => {
-    const storeApi = useStore as unknown as StoreApi<TStore>;
+  const adapter=useMemo<InternalStoreAdapter<TFilters>>(() => {
+    const storeApi=useStore as unknown as StoreApi<TStore>;
 
     return {
       subscribe(listener: () => void) {
@@ -98,8 +93,8 @@ export function useZustandAdapter<
       },
 
       getSnapshot(): StoreSnapshot<TFilters> {
-        const state = storeApi.getState();
-        const filters = (state[keys.state] as TFilters) || defaults;
+        const state=storeApi.getState();
+        const filters=(state[keys.state] as TFilters)||defaults;
         return {
           state: filters,
           version: versionRef.current,
@@ -112,44 +107,44 @@ export function useZustandAdapter<
       },
 
       setState(partial: Partial<TFilters>) {
-        const state = storeApi.getState();
-        const setFilters = state[keys.setFilters] as
-          | ((partial: Partial<TFilters>) => void)
-          | undefined;
+        const state=storeApi.getState();
+        const setFilters=state[keys.setFilters] as
+          |((partial: Partial<TFilters>) => void)
+          |undefined;
 
         if (setFilters) {
           setFilters(partial);
         } else {
           // Fallback: direct state update if slice actions not found
-          const current = (state[keys.state] as TFilters) || defaults;
-          (storeApi as unknown as StoreApi<Record<string, unknown>>).setState({
-            [keys.state]: { ...current, ...partial },
+          const current=(state[keys.state] as TFilters)||defaults;
+          (storeApi as unknown as StoreApi<Record<string,unknown>>).setState({
+            [keys.state]: {...current,...partial},
           });
         }
       },
 
-      setField<K extends keyof TFilters>(key: K, value: TFilters[K]) {
-        this.setState({ [key]: value } as unknown as Partial<TFilters>);
+      setField<K extends keyof TFilters>(key: K,value: TFilters[K]) {
+        this.setState({[key]: value} as unknown as Partial<TFilters>);
       },
 
       reset(fields?: (keyof TFilters)[]) {
-        const state = storeApi.getState();
-        const resetFilters = state[keys.resetFilters] as
-          | ((fields?: (keyof TFilters)[]) => void)
-          | undefined;
+        const state=storeApi.getState();
+        const resetFilters=state[keys.resetFilters] as
+          |((fields?: (keyof TFilters)[]) => void)
+          |undefined;
 
         if (resetFilters) {
           resetFilters(fields);
         } else {
           // Fallback: direct reset
           if (fields) {
-            const resetPartial: Partial<TFilters> = {};
+            const resetPartial: Partial<TFilters>={};
             for (const field of fields) {
-              resetPartial[field] = defaults[field];
+              resetPartial[field]=defaults[field];
             }
             this.setState(resetPartial);
           } else {
-            (storeApi as unknown as StoreApi<Record<string, unknown>>).setState(
+            (storeApi as unknown as StoreApi<Record<string,unknown>>).setState(
               {
                 [keys.state]: defaults,
               },
@@ -159,31 +154,31 @@ export function useZustandAdapter<
       },
 
       pause() {
-        const state = storeApi.getState();
-        const pauseFilters = state[keys.pauseFilters] as
-          | (() => void)
-          | undefined;
+        const state=storeApi.getState();
+        const pauseFilters=state[keys.pauseFilters] as
+          |(() => void)
+          |undefined;
 
         if (pauseFilters) {
           pauseFilters();
         } else {
-          (storeApi as unknown as StoreApi<Record<string, unknown>>).setState({
+          (storeApi as unknown as StoreApi<Record<string,unknown>>).setState({
             [keys.paused]: true,
           });
         }
       },
 
       resume() {
-        const state = storeApi.getState();
-        const resumeFilters = state[keys.resumeFilters] as
-          | (() => void)
-          | undefined;
+        const state=storeApi.getState();
+        const resumeFilters=state[keys.resumeFilters] as
+          |(() => void)
+          |undefined;
 
         if (resumeFilters) {
           resumeFilters();
         } else {
-          const pending = state[keys.pending] as Partial<TFilters> | null;
-          (storeApi as unknown as StoreApi<Record<string, unknown>>).setState({
+          const pending=state[keys.pending] as Partial<TFilters>|null;
+          (storeApi as unknown as StoreApi<Record<string,unknown>>).setState({
             [keys.paused]: false,
             [keys.pending]: null,
           });
@@ -195,8 +190,8 @@ export function useZustandAdapter<
       },
 
       isPaused() {
-        const state = storeApi.getState();
-        return (state[keys.paused] as boolean) || false;
+        const state=storeApi.getState();
+        return (state[keys.paused] as boolean)||false;
       },
 
       destroy() {
@@ -215,7 +210,7 @@ export function useZustandAdapter<
         return defaults;
       },
     };
-  }, [useStore, schema, id, defaults, initialState, keys]);
+  },[useStore,schema,id,defaults,initialState,keys]);
 
   return adapter;
 }

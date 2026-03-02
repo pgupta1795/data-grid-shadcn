@@ -8,8 +8,8 @@ import type {
   FieldBuilder,
   InferSchemaType,
   SchemaDefinition,
-} from "../schema/types";
-import type { TextParser, TextParserOptions } from "./types";
+} from "../schema/schemaTypes";
+import type {TextParser,TextParserOptions} from "./types";
 
 /**
  * Create a text parser for filter command input
@@ -31,60 +31,60 @@ import type { TextParser, TextParserOptions } from "./types";
  */
 export function createTextParser<T extends SchemaDefinition>(
   schema: T,
-  options: TextParserOptions = {},
+  options: TextParserOptions={},
 ): TextParser<T> {
   const {
-    aliases = {},
-    fieldDelimiter = " ",
-    keyValueDelimiter = ":",
-  } = options;
+    aliases={},
+    fieldDelimiter=" ",
+    keyValueDelimiter=":",
+  }=options;
 
   // Build reverse alias map
-  const reverseAliases: Record<string, string> = {};
-  for (const [alias, field] of Object.entries(aliases)) {
-    reverseAliases[field] = alias;
+  const reverseAliases: Record<string,string>={};
+  for (const [alias,field] of Object.entries(aliases)) {
+    reverseAliases[field]=alias;
   }
 
   // Resolve alias to field name
-  const resolveAlias = (key: string): string => {
-    return aliases[key] || key;
+  const resolveAlias=(key: string): string => {
+    return aliases[key]||key;
   };
 
   return {
     parse(input: string): Partial<InferSchemaType<T>> {
-      const result: Record<string, unknown> = {};
+      const result: Record<string,unknown>={};
 
       if (!input.trim()) {
         return result as Partial<InferSchemaType<T>>;
       }
 
       // Split by field delimiter, but handle quoted values
-      const parts = input
+      const parts=input
         .trim()
         .split(new RegExp(`\\s*${escapeRegex(fieldDelimiter)}\\s*`));
 
       for (const part of parts) {
         if (!part) continue;
 
-        const colonIndex = part.indexOf(keyValueDelimiter);
-        if (colonIndex === -1) continue;
+        const colonIndex=part.indexOf(keyValueDelimiter);
+        if (colonIndex===-1) continue;
 
-        const rawKey = part.slice(0, colonIndex).trim();
-        const rawValue = part.slice(colonIndex + 1).trim();
+        const rawKey=part.slice(0,colonIndex).trim();
+        const rawValue=part.slice(colonIndex+1).trim();
 
-        if (!rawKey || !rawValue) continue;
+        if (!rawKey||!rawValue) continue;
 
-        const fieldKey = resolveAlias(rawKey);
-        const fieldBuilder = schema[fieldKey] as
-          | FieldBuilder<unknown>
-          | undefined;
+        const fieldKey=resolveAlias(rawKey);
+        const fieldBuilder=schema[fieldKey] as
+          |FieldBuilder<unknown>
+          |undefined;
 
         if (!fieldBuilder) continue;
 
         try {
-          const parsed = fieldBuilder._config.parse(rawValue);
-          if (parsed !== null) {
-            result[fieldKey] = parsed;
+          const parsed=fieldBuilder._config.parse(rawValue);
+          if (parsed!==null) {
+            result[fieldKey]=parsed;
           }
         } catch {
           // Skip invalid values
@@ -95,17 +95,17 @@ export function createTextParser<T extends SchemaDefinition>(
     },
 
     serialize(state: Partial<InferSchemaType<T>>): string {
-      const parts: string[] = [];
+      const parts: string[]=[];
 
-      for (const [key, value] of Object.entries(state)) {
-        if (value === null || value === undefined) continue;
-        if (Array.isArray(value) && value.length === 0) continue;
+      for (const [key,value] of Object.entries(state)) {
+        if (value===null||value===undefined) continue;
+        if (Array.isArray(value)&&value.length===0) continue;
 
-        const fieldBuilder = schema[key] as FieldBuilder<unknown> | undefined;
+        const fieldBuilder=schema[key] as FieldBuilder<unknown>|undefined;
         if (!fieldBuilder) continue;
 
         try {
-          const serialized = fieldBuilder._config.serialize(value);
+          const serialized=fieldBuilder._config.serialize(value);
           if (serialized) {
             parts.push(`${key}${keyValueDelimiter}${serialized}`);
           }
@@ -117,37 +117,37 @@ export function createTextParser<T extends SchemaDefinition>(
       return parts.join(fieldDelimiter);
     },
 
-    getWordAtCaret(input: string, caretPosition: number) {
+    getWordAtCaret(input: string,caretPosition: number) {
       // Find word boundaries
-      let start = caretPosition;
-      let end = caretPosition;
+      let start=caretPosition;
+      let end=caretPosition;
 
       // Move start backwards to find word start
-      while (start > 0 && input[start - 1] !== fieldDelimiter) {
+      while (start>0&&input[start-1]!==fieldDelimiter) {
         start--;
       }
 
       // Move end forwards to find word end
-      while (end < input.length && input[end] !== fieldDelimiter) {
+      while (end<input.length&&input[end]!==fieldDelimiter) {
         end++;
       }
 
-      const word = input.slice(start, end);
-      const colonIndex = word.indexOf(keyValueDelimiter);
+      const word=input.slice(start,end);
+      const colonIndex=word.indexOf(keyValueDelimiter);
 
-      let field: string | null = null;
-      let value: string | null = null;
+      let field: string|null=null;
+      let value: string|null=null;
 
-      if (colonIndex !== -1) {
-        field = resolveAlias(word.slice(0, colonIndex));
-        value = word.slice(colonIndex + 1);
+      if (colonIndex!==-1) {
+        field=resolveAlias(word.slice(0,colonIndex));
+        value=word.slice(colonIndex+1);
       } else {
         // Could be a partial field name
-        field = null;
-        value = null;
+        field=null;
+        value=null;
       }
 
-      return { word, start, end, field, value };
+      return {word,start,end,field,value};
     },
 
     replaceWordAtCaret(
@@ -155,28 +155,28 @@ export function createTextParser<T extends SchemaDefinition>(
       caretPosition: number,
       replacement: string,
     ) {
-      const { start, end } = this.getWordAtCaret(input, caretPosition);
+      const {start,end}=this.getWordAtCaret(input,caretPosition);
 
-      const before = input.slice(0, start);
-      const after = input.slice(end);
+      const before=input.slice(0,start);
+      const after=input.slice(end);
 
-      const newInput = before + replacement + after;
-      const newCaretPosition = start + replacement.length;
+      const newInput=before+replacement+after;
+      const newCaretPosition=start+replacement.length;
 
-      return { newInput, newCaretPosition };
+      return {newInput,newCaretPosition};
     },
 
     getSuggestions(
       input: string,
       caretPosition: number,
-      fieldOptions: Record<string, string[]>,
+      fieldOptions: Record<string,string[]>,
     ) {
-      const { word, field, value } = this.getWordAtCaret(input, caretPosition);
+      const {word,field,value}=this.getWordAtCaret(input,caretPosition);
 
       // If we have a field and are typing a value
-      if (field && value !== null) {
-        const options = fieldOptions[field] || [];
-        const filtered = options.filter((opt) =>
+      if (field&&value!==null) {
+        const options=fieldOptions[field]||[];
+        const filtered=options.filter((opt) =>
           opt.toLowerCase().includes(value.toLowerCase()),
         );
 
@@ -188,15 +188,15 @@ export function createTextParser<T extends SchemaDefinition>(
       }
 
       // Otherwise, suggest field names
-      const schemaKeys = Object.keys(schema);
-      const aliasKeys = Object.keys(aliases);
-      const allFields = [...schemaKeys, ...aliasKeys];
+      const schemaKeys=Object.keys(schema);
+      const aliasKeys=Object.keys(aliases);
+      const allFields=[...schemaKeys,...aliasKeys];
 
-      const filtered = word
+      const filtered=word
         ? allFields.filter((f) =>
-            f.toLowerCase().startsWith(word.toLowerCase()),
-          )
-        : allFields;
+          f.toLowerCase().startsWith(word.toLowerCase()),
+        )
+        :allFields;
 
       return {
         type: "field" as const,
@@ -210,5 +210,5 @@ export function createTextParser<T extends SchemaDefinition>(
  * Escape special regex characters
  */
 function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return str.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
 }

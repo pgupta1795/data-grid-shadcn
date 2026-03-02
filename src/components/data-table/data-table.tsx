@@ -4,6 +4,12 @@
 // https://github.com/TanStack/table/issues/5567
 "use no memo";
 
+import {DataTableFilterCommand} from "@/components/data-table/data-table-filter-command/index";
+import {DataTableFilterControls} from "@/components/data-table/data-table-filter-controls";
+import {DataTablePagination} from "@/components/data-table/data-table-pagination";
+import {DataTableProvider} from "@/components/data-table/data-table-provider";
+import {DataTableToolbar} from "@/components/data-table/data-table-toolbar";
+import type {DataTableFilterField,SheetField} from "@/components/data-table/types";
 import {
   Table,
   TableBody,
@@ -11,17 +17,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/custom/table";
-import { DataTableFilterCommand } from "@/components/data-table/data-table-filter-command";
-import { DataTableFilterControls } from "@/components/data-table/data-table-filter-controls";
-import { DataTablePagination } from "@/components/data-table/data-table-pagination";
-import { DataTableProvider } from "@/components/data-table/data-table-provider";
-import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
-import type { DataTableFilterField, SheetField } from "@/components/data-table/types";
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import { getColumnVisibilityKey } from "@/lib/constants/local-storage";
-import type { SchemaDefinition } from "@/lib/store/schema/types";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/table";
+import {useLocalStorage} from "@/hooks/use-local-storage";
+import {getColumnVisibilityKey} from "@/lib/constants/local-storage";
+import type {SchemaDefinition} from "@/lib/store/schema/schemaTypes";
+import {cn} from "@/lib/utils";
+import type {FetchNextPageOptions,FetchPreviousPageOptions,RefetchOptions} from "@tanstack/react-query";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -44,13 +45,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { FetchNextPageOptions, FetchPreviousPageOptions, RefetchOptions } from "@tanstack/react-query";
 import * as React from "react";
 
-export interface DataTableProps<TData, TValue> {
+export interface DataTableProps<TData,TValue> {
   // ── Core ──────────────────────────────────────────────────────────────────
   data: TData[];
-  columns: ColumnDef<TData, TValue>[];
+  columns: ColumnDef<TData,TValue>[];
   filterFields?: DataTableFilterField<TData>[];
   // BYOS — required so component is not coupled to a specific schema
   schema: SchemaDefinition;
@@ -71,11 +71,11 @@ export interface DataTableProps<TData, TValue> {
   getFacetedUniqueValues?: (
     table: TTable<TData>,
     columnId: string,
-  ) => Map<string, number>;
+  ) => Map<string,number>;
   getFacetedMinMaxValues?: (
     table: TTable<TData>,
     columnId: string,
-  ) => [number, number] | undefined;
+  ) => [number,number]|undefined;
 
   // ── Column features ───────────────────────────────────────────────────────
   enableColumnOrdering?: boolean;
@@ -96,7 +96,7 @@ export interface DataTableProps<TData, TValue> {
 
   // ── Sheet / detail panel ──────────────────────────────────────────────────
   sheetFields?: SheetField<TData>[];
-  renderSheetTitle?: (props: { row?: Row<TData> }) => React.ReactNode;
+  renderSheetTitle?: (props: {row?: Row<TData>}) => React.ReactNode;
 
   // ── Render slots ──────────────────────────────────────────────────────────
   /** Passed to DataTableToolbar — renders after the reset button and before view options */
@@ -107,14 +107,14 @@ export interface DataTableProps<TData, TValue> {
   renderSidebarFooter?: () => React.ReactNode;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData,TValue>({
   columns,
   data,
-  defaultColumnFilters = [],
-  defaultSorting = [],
-  defaultColumnVisibility = {},
-  defaultPagination = { pageIndex: 0, pageSize: 10 },
-  filterFields = [],
+  defaultColumnFilters=[],
+  defaultSorting=[],
+  defaultColumnVisibility={},
+  defaultPagination={pageIndex: 0,pageSize: 10},
+  filterFields=[],
   getFacetedUniqueValues: externalGetFacetedUniqueValues,
   getFacetedMinMaxValues: externalGetFacetedMinMaxValues,
   isLoading,
@@ -123,14 +123,14 @@ export function DataTable<TData, TValue>({
   renderActions,
   renderChart,
   renderSidebarFooter,
-}: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] =
+}: DataTableProps<TData,TValue>) {
+  const [columnFilters,setColumnFilters]=
     React.useState<ColumnFiltersState>(defaultColumnFilters);
-  const [sorting, setSorting] =
+  const [sorting,setSorting]=
     React.useState<SortingState>(defaultSorting);
-  const [pagination, setPagination] =
+  const [pagination,setPagination]=
     React.useState<PaginationState>(defaultPagination);
-  const [columnVisibility, setColumnVisibility] =
+  const [columnVisibility,setColumnVisibility]=
     useLocalStorage<VisibilityState>(
       getColumnVisibilityKey(tableId),
       defaultColumnVisibility,
@@ -138,21 +138,21 @@ export function DataTable<TData, TValue>({
 
   // Reset pagination when filters change to avoid showing empty pages
   React.useEffect(() => {
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [columnFilters]);
+    setPagination((prev) => ({...prev,pageIndex: 0}));
+  },[columnFilters]);
 
   // Custom getFacetedUniqueValues that handles array column values
-  const customGetFacetedUniqueValues = React.useCallback(
-    (table: TTable<TData>, columnId: string) => () => {
-      const facets = getFacetedUniqueValues<TData>()(table, columnId)();
-      const customFacets = new Map();
-      for (const [key, value] of facets as Map<unknown, number>) {
+  const customGetFacetedUniqueValues=React.useCallback(
+    (table: TTable<TData>,columnId: string) => () => {
+      const facets=getFacetedUniqueValues<TData>()(table,columnId)();
+      const customFacets=new Map();
+      for (const [key,value] of facets as Map<unknown,number>) {
         if (Array.isArray(key)) {
           for (const k of key) {
-            customFacets.set(k, (customFacets.get(k) || 0) + value);
+            customFacets.set(k,(customFacets.get(k)||0)+value);
           }
         } else {
-          customFacets.set(key, (customFacets.get(key) || 0) + value);
+          customFacets.set(key,(customFacets.get(key)||0)+value);
         }
       }
       return customFacets;
@@ -160,10 +160,10 @@ export function DataTable<TData, TValue>({
     [],
   );
 
-  const table = useReactTable({
+  const table=useReactTable({
     data,
     columns,
-    state: { columnFilters, sorting, columnVisibility, pagination },
+    state: {columnFilters,sorting,columnVisibility,pagination},
     onColumnVisibilityChange: setColumnVisibility,
     onColumnFiltersChange: setColumnFilters,
     onSortingChange: setSorting,
@@ -180,15 +180,15 @@ export function DataTable<TData, TValue>({
   });
 
   // Adapter signature for DataTableProvider
-  const getFacetedUniqueValuesForProvider = React.useCallback(
-    (table: TTable<TData>, columnId: string): Map<string, number> => {
+  const getFacetedUniqueValuesForProvider=React.useCallback(
+    (table: TTable<TData>,columnId: string): Map<string,number> => {
       // Prefer externally-provided (server-side) facets over computed ones
       if (externalGetFacetedUniqueValues) {
-        return externalGetFacetedUniqueValues(table, columnId);
+        return externalGetFacetedUniqueValues(table,columnId);
       }
-      return customGetFacetedUniqueValues(table, columnId)();
+      return customGetFacetedUniqueValues(table,columnId)();
     },
-    [customGetFacetedUniqueValues, externalGetFacetedUniqueValues],
+    [customGetFacetedUniqueValues,externalGetFacetedUniqueValues],
   );
 
   return (
@@ -229,21 +229,21 @@ export function DataTable<TData, TValue>({
                       <TableHead key={header.id}>
                         {header.isPlaceholder
                           ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
+                          :flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                       </TableHead>
                     ))}
                   </TableRow>
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
+                      data-state={row.getIsSelected()&&"selected"}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
@@ -255,7 +255,7 @@ export function DataTable<TData, TValue>({
                       ))}
                     </TableRow>
                   ))
-                ) : (
+                ):(
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}

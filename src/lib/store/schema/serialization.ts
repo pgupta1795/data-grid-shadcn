@@ -4,7 +4,7 @@
  * Functions for serializing state to strings and parsing strings back to state.
  */
 
-import type { FieldBuilder, InferSchemaType, SchemaDefinition } from "./types";
+import type {FieldBuilder,InferSchemaType,SchemaDefinition} from "./schemaTypes";
 
 /**
  * Get default values from a schema definition
@@ -12,10 +12,10 @@ import type { FieldBuilder, InferSchemaType, SchemaDefinition } from "./types";
 export function getSchemaDefaults<T extends SchemaDefinition>(
   schema: T,
 ): InferSchemaType<T> {
-  const defaults: Record<string, unknown> = {};
+  const defaults: Record<string,unknown>={};
 
-  for (const [key, fieldBuilder] of Object.entries(schema)) {
-    defaults[key] = fieldBuilder._config.defaultValue;
+  for (const [key,fieldBuilder] of Object.entries(schema)) {
+    defaults[key]=fieldBuilder._config.defaultValue;
   }
 
   return defaults as InferSchemaType<T>;
@@ -27,16 +27,16 @@ export function getSchemaDefaults<T extends SchemaDefinition>(
 export function serializeState<T extends SchemaDefinition>(
   schema: T,
   state: Partial<InferSchemaType<T>>,
-): Record<string, string> {
-  const result: Record<string, string> = {};
+): Record<string,string> {
+  const result: Record<string,string>={};
 
-  for (const [key, value] of Object.entries(state)) {
-    const fieldBuilder = schema[key] as FieldBuilder<unknown> | undefined;
+  for (const [key,value] of Object.entries(state)) {
+    const fieldBuilder=schema[key] as FieldBuilder<unknown>|undefined;
     if (!fieldBuilder) continue;
 
-    const serialized = fieldBuilder._config.serialize(value);
-    if (serialized !== "") {
-      result[key] = serialized;
+    const serialized=fieldBuilder._config.serialize(value);
+    if (serialized!=="") {
+      result[key]=serialized;
     }
   }
 
@@ -48,22 +48,22 @@ export function serializeState<T extends SchemaDefinition>(
  */
 export function parseState<T extends SchemaDefinition>(
   schema: T,
-  stringMap: Record<string, string | string[] | undefined>,
+  stringMap: Record<string,string|string[]|undefined>,
 ): Partial<InferSchemaType<T>> {
-  const result: Record<string, unknown> = {};
+  const result: Record<string,unknown>={};
 
-  for (const [key, fieldBuilder] of Object.entries(schema)) {
-    const rawValue = stringMap[key];
-    if (rawValue === undefined) continue;
+  for (const [key,fieldBuilder] of Object.entries(schema)) {
+    const rawValue=stringMap[key];
+    if (rawValue===undefined) continue;
 
     // Handle array values from URL (Next.js can pass arrays)
-    const strValue = Array.isArray(rawValue) ? rawValue.join(",") : rawValue;
+    const strValue=Array.isArray(rawValue)? rawValue.join(","):rawValue;
 
-    const parsed = (fieldBuilder as FieldBuilder<unknown>)._config.parse(
+    const parsed=(fieldBuilder as FieldBuilder<unknown>)._config.parse(
       strValue,
     );
-    if (parsed !== null) {
-      result[key] = parsed;
+    if (parsed!==null) {
+      result[key]=parsed;
     }
   }
 
@@ -77,25 +77,25 @@ export function validateState<T extends SchemaDefinition>(
   schema: T,
   state: unknown,
 ): InferSchemaType<T> {
-  const defaults = getSchemaDefaults(schema);
+  const defaults=getSchemaDefaults(schema);
 
-  if (!state || typeof state !== "object") {
+  if (!state||typeof state!=="object") {
     return defaults;
   }
 
-  const result: Record<string, unknown> = { ...defaults };
+  const result: Record<string,unknown>={...defaults};
 
-  for (const [key, fieldBuilder] of Object.entries(schema)) {
-    const value = (state as Record<string, unknown>)[key];
-    if (value === undefined) continue;
+  for (const [key,fieldBuilder] of Object.entries(schema)) {
+    const value=(state as Record<string,unknown>)[key];
+    if (value===undefined) continue;
 
     // Serialize and re-parse to validate
-    const config = (fieldBuilder as FieldBuilder<unknown>)._config;
-    const serialized = config.serialize(value);
-    const parsed = config.parse(serialized);
+    const config=(fieldBuilder as FieldBuilder<unknown>)._config;
+    const serialized=config.serialize(value);
+    const parsed=config.parse(serialized);
 
-    if (parsed !== null) {
-      result[key] = parsed;
+    if (parsed!==null) {
+      result[key]=parsed;
     }
     // If invalid, default is already in result
   }
@@ -110,53 +110,53 @@ export function mergeWithDefaults<T extends SchemaDefinition>(
   schema: T,
   partial: Partial<InferSchemaType<T>>,
 ): InferSchemaType<T> {
-  const defaults = getSchemaDefaults(schema);
-  return { ...defaults, ...partial };
+  const defaults=getSchemaDefaults(schema);
+  return {...defaults,...partial};
 }
 
 /**
  * Check if two states are equal (shallow comparison for primitives, deep for arrays)
  */
-export function isStateEqual<T extends Record<string, unknown>>(
+export function isStateEqual<T extends Record<string,unknown>>(
   a: T,
   b: T,
 ): boolean {
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
+  const keysA=Object.keys(a);
+  const keysB=Object.keys(b);
 
-  if (keysA.length !== keysB.length) return false;
+  if (keysA.length!==keysB.length) return false;
 
   for (const key of keysA) {
-    const valA = a[key];
-    const valB = b[key];
+    const valA=a[key];
+    const valB=b[key];
 
-    if (valA === valB) continue;
+    if (valA===valB) continue;
 
     // Handle arrays
-    if (Array.isArray(valA) && Array.isArray(valB)) {
-      if (valA.length !== valB.length) return false;
-      for (let i = 0; i < valA.length; i++) {
-        if (valA[i] !== valB[i]) return false;
+    if (Array.isArray(valA)&&Array.isArray(valB)) {
+      if (valA.length!==valB.length) return false;
+      for (let i=0;i<valA.length;i++) {
+        if (valA[i]!==valB[i]) return false;
       }
       continue;
     }
 
     // Handle dates
-    if (valA instanceof Date && valB instanceof Date) {
-      if (valA.getTime() !== valB.getTime()) return false;
+    if (valA instanceof Date&&valB instanceof Date) {
+      if (valA.getTime()!==valB.getTime()) return false;
       continue;
     }
 
     // Handle objects (sort field)
     if (
-      valA !== null &&
-      valB !== null &&
-      typeof valA === "object" &&
-      typeof valB === "object"
+      valA!==null&&
+      valB!==null&&
+      typeof valA==="object"&&
+      typeof valB==="object"
     ) {
-      const objA = valA as Record<string, unknown>;
-      const objB = valB as Record<string, unknown>;
-      if (!isStateEqual(objA, objB)) return false;
+      const objA=valA as Record<string,unknown>;
+      const objB=valB as Record<string,unknown>;
+      if (!isStateEqual(objA,objB)) return false;
       continue;
     }
 
@@ -173,15 +173,15 @@ export function stateToSearchString<T extends SchemaDefinition>(
   schema: T,
   state: Partial<InferSchemaType<T>>,
 ): string {
-  const serialized = serializeState(schema, state);
-  const params = new URLSearchParams();
+  const serialized=serializeState(schema,state);
+  const params=new URLSearchParams();
 
-  for (const [key, value] of Object.entries(serialized)) {
+  for (const [key,value] of Object.entries(serialized)) {
     if (value) {
-      params.set(key, value);
+      params.set(key,value);
     }
   }
 
-  const str = params.toString();
-  return str ? `?${str}` : "";
+  const str=params.toString();
+  return str? `?${str}`:"";
 }

@@ -3,20 +3,20 @@ import {
   TableBody,
   TableCell,
   TableRow,
-} from "@/components/custom/table";
-import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { Check, Copy } from "lucide-react";
+} from "@/components/ui/table";
+import {useCopyToClipboard} from "@/hooks/use-copy-to-clipboard";
+import {Check,Copy} from "lucide-react";
 
 interface KeyValueTableProps {
-  data: Record<string, string>;
+  data: Record<string,string>;
 }
-export function KeyValueTable({ data }: KeyValueTableProps) {
+export function KeyValueTable({data}: KeyValueTableProps) {
   return (
     <div className="mx-auto max-w-lg">
       <div className="overflow-hidden rounded-lg border border-border bg-background">
         <Table>
           <TableBody>
-            {Object.entries(data).map(([key, value]) => {
+            {Object.entries(data).map(([key,value]) => {
               return <RowAction key={key} label={key} value={value} />;
             })}
           </TableBody>
@@ -26,8 +26,8 @@ export function KeyValueTable({ data }: KeyValueTableProps) {
   );
 }
 
-function RowAction({ label, value }: { label: string; value: string }) {
-  const { copy, isCopied } = useCopyToClipboard();
+function RowAction({label,value}: {label: string; value: string}) {
+  const {copy,isCopied}=useCopyToClipboard();
 
   return (
     <TableRow
@@ -43,9 +43,9 @@ function RowAction({ label, value }: { label: string; value: string }) {
       <TableCell className="relative py-1 font-mono">
         {value}
         <div className="invisible absolute right-1.5 top-1.5 rounded-sm border border-border bg-background p-0.5 backdrop-blur-sm group-hover:visible">
-          {!isCopied ? (
+          {!isCopied? (
             <Copy className="h-3 w-3" />
-          ) : (
+          ):(
             <Check className="h-3 w-3" />
           )}
         </div>

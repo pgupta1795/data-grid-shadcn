@@ -2,7 +2,7 @@
  * Text Parser Types
  */
 
-import type { InferSchemaType, SchemaDefinition } from "../schema/types";
+import type {InferSchemaType,SchemaDefinition} from "../schema/schemaTypes";
 
 /**
  * Options for creating a text parser
@@ -11,7 +11,7 @@ export interface TextParserOptions {
   /**
    * Field aliases for shorthand (e.g., { l: 'level', r: 'regions' })
    */
-  aliases?: Record<string, string>;
+  aliases?: Record<string,string>;
 
   /**
    * Delimiter between field:value pairs (default: ' ')
@@ -60,8 +60,8 @@ export interface TextParser<T extends SchemaDefinition> {
     word: string;
     start: number;
     end: number;
-    field: string | null;
-    value: string | null;
+    field: string|null;
+    value: string|null;
   };
 
   /**
@@ -82,9 +82,9 @@ export interface TextParser<T extends SchemaDefinition> {
   getSuggestions(
     input: string,
     caretPosition: number,
-    fieldOptions: Record<string, string[]>,
+    fieldOptions: Record<string,string[]>,
   ): {
-    type: "field" | "value";
+    type: "field"|"value";
     field?: string;
     suggestions: string[];
   };

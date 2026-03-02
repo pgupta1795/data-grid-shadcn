@@ -7,15 +7,13 @@
 
 "use client";
 
-import { useQueryStates, type ParserBuilder } from "nuqs";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { InternalStoreAdapter } from "../../adapter/types";
-import { getSchemaDefaults, validateState } from "../../schema/serialization";
-import type { SchemaDefinition, StoreSnapshot } from "../../schema/types";
-import { schemaToNuqsParsers } from "./parser-bridge";
-import type { NuqsAdapterOptions } from "./types";
-
-export type { NuqsAdapterOptions } from "./types";
+import {useQueryStates,type ParserBuilder} from "nuqs";
+import {useEffect,useMemo,useRef} from "react";
+import type {InternalStoreAdapter} from "../../adapter/adapterTypes";
+import type {SchemaDefinition,StoreSnapshot} from "../../schema/schemaTypes";
+import {getSchemaDefaults,validateState} from "../../schema/serialization";
+import type {NuqsAdapterOptions} from "./nuqsTypes";
+import {schemaToNuqsParsers} from "./parser-bridge";
 
 /**
  * Create a nuqs adapter for URL-based state management
@@ -37,25 +35,25 @@ export type { NuqsAdapterOptions } from "./types";
  * }
  * ```
  */
-export function useNuqsAdapter<T extends Record<string, unknown>>(
+export function useNuqsAdapter<T extends Record<string,unknown>>(
   schema: SchemaDefinition,
   options: NuqsAdapterOptions<T>,
 ): InternalStoreAdapter<T> {
   const {
     id,
     initialState,
-    shallow = true,
-    history = "push",
-    scroll = false,
-    throttleMs = 50,
-  } = options;
+    shallow=true,
+    history="push",
+    scroll=false,
+    throttleMs=50,
+  }=options;
 
-  const parsers = useMemo(() => schemaToNuqsParsers(schema), [schema]);
-  const defaults = useMemo(() => getSchemaDefaults(schema) as T, [schema]);
+  const parsers=useMemo(() => schemaToNuqsParsers(schema),[schema]);
+  const defaults=useMemo(() => getSchemaDefaults(schema) as T,[schema]);
 
   // Use nuqs hook
-  const [nuqsState, setNuqsState] = useQueryStates(
-    parsers as Record<string, ParserBuilder<unknown>>,
+  const [nuqsState,setNuqsState]=useQueryStates(
+    parsers as Record<string,ParserBuilder<unknown>>,
     {
       shallow,
       history,
@@ -65,36 +63,36 @@ export function useNuqsAdapter<T extends Record<string, unknown>>(
   );
 
   // Store state and version
-  const stateRef = useRef<T>(defaults);
-  const versionRef = useRef(0);
-  const listenersRef = useRef(new Set<() => void>());
-  const pausedRef = useRef(false);
-  const pendingStateRef = useRef<Partial<T> | null>(null);
+  const stateRef=useRef<T>(defaults);
+  const versionRef=useRef(0);
+  const listenersRef=useRef(new Set<() => void>());
+  const pausedRef=useRef(false);
+  const pendingStateRef=useRef<Partial<T>|null>(null);
 
   // Cache server snapshot to avoid infinite loop with useSyncExternalStore
-  const serverSnapshotRef = useRef<StoreSnapshot<T>>({
-    state: { ...defaults, ...initialState } as T,
+  const serverSnapshotRef=useRef<StoreSnapshot<T>>({
+    state: {...defaults,...initialState} as T,
     version: 0,
   });
 
   // Sync nuqs state to our state ref synchronously (needed for first render)
-  const validated = validateState(schema, nuqsState) as T;
-  const currentState = { ...defaults, ...initialState, ...validated };
-  if (stateRef.current !== currentState) {
-    stateRef.current = currentState;
+  const validated=validateState(schema,nuqsState) as T;
+  const currentState={...defaults,...initialState,...validated};
+  if (stateRef.current!==currentState) {
+    stateRef.current=currentState;
   }
 
   // Also update via effect to trigger listeners on subsequent changes
   useEffect(() => {
-    const validated = validateState(schema, nuqsState) as T;
-    const merged = { ...defaults, ...initialState, ...validated };
-    stateRef.current = merged;
+    const validated=validateState(schema,nuqsState) as T;
+    const merged={...defaults,...initialState,...validated};
+    stateRef.current=merged;
     versionRef.current++;
     listenersRef.current.forEach((listener) => listener());
-  }, [nuqsState, schema, defaults, initialState]);
+  },[nuqsState,schema,defaults,initialState]);
 
   // Create stable adapter reference
-  const adapter = useMemo<InternalStoreAdapter<T>>(() => {
+  const adapter=useMemo<InternalStoreAdapter<T>>(() => {
     return {
       subscribe(listener: () => void) {
         listenersRef.current.add(listener);
@@ -117,7 +115,7 @@ export function useNuqsAdapter<T extends Record<string, unknown>>(
 
       setState(partial: Partial<T>) {
         if (pausedRef.current) {
-          pendingStateRef.current = {
+          pendingStateRef.current={
             ...pendingStateRef.current,
             ...partial,
           };
@@ -125,23 +123,23 @@ export function useNuqsAdapter<T extends Record<string, unknown>>(
         }
 
         // Convert undefined values to null for nuqs
-        const nuqsPartial: Record<string, unknown> = {};
-        for (const [key, value] of Object.entries(partial)) {
-          nuqsPartial[key] = value === undefined ? null : value;
+        const nuqsPartial: Record<string,unknown>={};
+        for (const [key,value] of Object.entries(partial)) {
+          nuqsPartial[key]=value===undefined? null:value;
         }
 
-        setNuqsState((prev) => ({ ...prev, ...nuqsPartial }));
+        setNuqsState((prev) => ({...prev,...nuqsPartial}));
       },
 
-      setField<K extends keyof T>(key: K, value: T[K]) {
-        this.setState({ [key]: value } as unknown as Partial<T>);
+      setField<K extends keyof T>(key: K,value: T[K]) {
+        this.setState({[key]: value} as unknown as Partial<T>);
       },
 
       reset(fields?: (keyof T)[]) {
         if (fields) {
-          const resetPartial: Partial<T> = {};
+          const resetPartial: Partial<T>={};
           for (const field of fields) {
-            resetPartial[field] = defaults[field];
+            resetPartial[field]=defaults[field];
           }
           this.setState(resetPartial);
         } else {
@@ -150,14 +148,14 @@ export function useNuqsAdapter<T extends Record<string, unknown>>(
       },
 
       pause() {
-        pausedRef.current = true;
+        pausedRef.current=true;
       },
 
       resume() {
-        pausedRef.current = false;
+        pausedRef.current=false;
         if (pendingStateRef.current) {
           this.setState(pendingStateRef.current);
-          pendingStateRef.current = null;
+          pendingStateRef.current=null;
         }
       },
 
@@ -183,19 +181,20 @@ export function useNuqsAdapter<T extends Record<string, unknown>>(
 
       // Internal methods for provider sync
       _syncState(state: T) {
-        stateRef.current = state;
+        stateRef.current=state;
         versionRef.current++;
         listenersRef.current.forEach((listener) => listener());
       },
     };
-  }, [id, schema, defaults, initialState, setNuqsState]);
+  },[id,schema,defaults,initialState,setNuqsState]);
 
   return adapter;
 }
 
 // Re-export parser bridge utilities for advanced use cases
-export { schemaToNuqsParsers, createSchemaSerializer } from "./parser-bridge";
+export {createSchemaSerializer,schemaToNuqsParsers} from "./parser-bridge";
 
 // Re-export nuqs types for components that need them
 // This allows components to import from the adapter layer instead of nuqs directly
-export type { ParserBuilder } from "nuqs";
+export type {ParserBuilder} from "nuqs";
+

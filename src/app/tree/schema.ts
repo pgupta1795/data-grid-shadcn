@@ -1,6 +1,6 @@
-import { createSchema, field } from "@/lib/store/schema";
+import {createSchema,field} from "@/lib/store/schema/schema";
 
-export const filterSchema = createSchema({
+export const filterSchema=createSchema({
   // Text input filters
   title: field.string(),
   name: field.string(),
@@ -21,4 +21,4 @@ export const filterSchema = createSchema({
   sort: field.sort(),
 });
 
-export type FilterState = typeof filterSchema._type;
+export type FilterState=typeof filterSchema._type;

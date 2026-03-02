@@ -31,7 +31,8 @@
         "popover",
         "checkbox",
         "separator",
-        "calendar"
+        "calendar",
+        "drawer"
       ],
       "files": [
         {
@@ -61,7 +62,7 @@
         },
         {
           "path": "src/components/data-table/data-table-filter-controls-drawer.tsx",
-          "type": "registry:component",
+          "type": "registry:block",
           "target": "components/data-grid/data-table-filter-controls-drawer.tsx"
         },
         {
@@ -186,12 +187,12 @@
         },
         {
           "path": "src/components/data-table/types.ts",
-          "type": "registry:component",
+          "type": "registry:lib",
           "target": "components/data-grid/types.ts"
         },
         {
           "path": "src/components/data-table/utils.ts",
-          "type": "registry:component",
+          "type": "registry:lib",
           "target": "components/data-grid/utils.ts"
         },
         {
@@ -200,14 +201,19 @@
           "target": "lib/data-grid/store/index.ts"
         },
         {
+          "path": "src/lib/store/context.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/context.ts"
+        },
+        {
           "path": "src/lib/store/schema/field.ts",
           "type": "registry:lib",
           "target": "lib/data-grid/store/schema/field.ts"
         },
         {
-          "path": "src/lib/store/schema/index.ts",
+          "path": "src/lib/store/schema/schema.ts",
           "type": "registry:lib",
-          "target": "lib/data-grid/store/schema/index.ts"
+          "target": "lib/data-grid/store/schema/schema.ts"
         },
         {
           "path": "src/lib/store/schema/serialization.ts",
@@ -215,14 +221,44 @@
           "target": "lib/data-grid/store/schema/serialization.ts"
         },
         {
-          "path": "src/lib/store/schema/types.ts",
+          "path": "src/lib/store/schema/schemaTypes.ts",
           "type": "registry:lib",
-          "target": "lib/data-grid/store/schema/types.ts"
+          "target": "lib/data-grid/store/schema/schemaTypes.ts"
+        },
+        {
+          "path": "src/lib/store/adapter/adapterTypes.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/adapter/adapterTypes.ts"
+        },
+        {
+          "path": "src/lib/store/adapters/nuqs/nuqsTypes.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/adapters/nuqs/nuqsTypes.ts"
+        },
+        {
+          "path": "src/lib/store/adapters/nuqs/server.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/adapters/nuqs/server.ts"
+        },
+        {
+          "path": "src/lib/store/adapters/nuqs/parser-bridge.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/adapters/nuqs/parser-bridge.ts"
         },
         {
           "path": "src/lib/store/adapters/nuqs/index.ts",
           "type": "registry:lib",
           "target": "lib/data-grid/store/adapters/nuqs/index.ts"
+        },
+        {
+          "path": "src/lib/store/parser/text-parser.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/parser/text-parser.ts"
+        },
+        {
+          "path": "src/lib/store/parser/types.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/parser/types.ts"
         },
         {
           "path": "src/lib/store/provider/DataTableStoreProvider.tsx",
@@ -240,9 +276,34 @@
           "target": "lib/data-grid/store/hooks/useFilterActions.ts"
         },
         {
+          "path": "src/lib/store/hooks/useFilterField.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/hooks/useFilterField.ts"
+        },
+        {
+          "path": "src/lib/store/hooks/useReactTableSync.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/hooks/useReactTableSync.ts"
+        },
+        {
+          "path": "src/lib/store/hooks/index.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/store/hooks/index.ts"
+        },
+        {
           "path": "src/lib/is-array.ts",
           "type": "registry:lib",
           "target": "lib/data-grid/is-array.ts"
+        },
+        {
+          "path": "src/lib/delimiters.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/delimiters.ts"
+        },
+        {
+          "path": "src/lib/compose-refs.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/compose-refs.ts"
         },
         {
           "path": "src/components/data-table/data-table-infinite.tsx",
@@ -258,6 +319,11 @@
           "path": "src/components/custom/kbd.tsx",
           "type": "registry:component",
           "target": "components/data-grid/custom/kbd.tsx"
+        },
+        {
+          "path": "src/components/custom/sortable.tsx",
+          "type": "registry:component",
+          "target": "components/data-grid/custom/sortable.tsx"
         },
         {
           "path": "src/hooks/use-hot-key.ts",
@@ -280,6 +346,16 @@
           "target": "lib/data-grid/constants/local-storage.ts"
         },
         {
+          "path": "src/constants/region.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/constants/region.ts"
+        },
+        {
+          "path": "src/constants/date-preset.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/constants/date-preset.ts"
+        },
+        {
           "path": "src/hooks/use-local-storage.ts",
           "type": "registry:hook",
           "target": "hooks/use-local-storage.ts"
@@ -300,11 +376,6 @@
           "target": "hooks/use-debounce.ts"
         },
         {
-          "path": "src/components/custom/slider.tsx",
-          "type": "registry:component",
-          "target": "components/data-grid/custom/slider.tsx"
-        },
-        {
           "path": "src/components/custom/date-picker-with-range.tsx",
           "type": "registry:component",
           "target": "components/data-grid/custom/date-picker-with-range.tsx"
@@ -323,6 +394,66 @@
           "path": "src/lib/table/filterfns.ts",
           "type": "registry:lib",
           "target": "lib/data-grid/table/filterfns.ts"
+        },
+        {
+          "path": "src/lib/table-schema/index.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/index.ts"
+        },
+        {
+          "path": "src/lib/table-schema/col.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/col.ts"
+        },
+        {
+          "path": "src/lib/table-schema/infer.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/infer.ts"
+        },
+        {
+          "path": "src/lib/table-schema/presets.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/presets.ts"
+        },
+        {
+          "path": "src/lib/table-schema/serialize.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/serialize.ts"
+        },
+        {
+          "path": "src/lib/table-schema/types.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/types.ts"
+        },
+        {
+          "path": "src/lib/table-schema/to-typescript.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/to-typescript.ts"
+        },
+        {
+          "path": "src/lib/table-schema/validate.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/validate.ts"
+        },
+        {
+          "path": "src/lib/table-schema/generators/columns.tsx",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/generators/columns.tsx"
+        },
+        {
+          "path": "src/lib/table-schema/generators/filter-fields.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/generators/filter-fields.ts"
+        },
+        {
+          "path": "src/lib/table-schema/generators/filter-schema.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/generators/filter-schema.ts"
+        },
+        {
+          "path": "src/lib/table-schema/generators/sheet-fields.ts",
+          "type": "registry:lib",
+          "target": "lib/data-grid/table-schema/generators/sheet-fields.ts"
         }
       ]
     }

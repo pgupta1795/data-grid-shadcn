@@ -16,7 +16,7 @@ import {useHotKey} from "@/hooks/use-hot-key";
 import {useLocalStorage} from "@/hooks/use-local-storage";
 import {getCommandHistoryKey} from "@/lib/constants/local-storage";
 import {formatCompactNumber} from "@/lib/format";
-import type {SchemaDefinition} from "@/lib/store/schema/types";
+import type {SchemaDefinition} from "@/lib/store/schema/schemaTypes";
 import {cn} from "@/lib/utils";
 import {formatDistanceToNow} from "date-fns";
 import {LoaderCircle,Search,X} from "lucide-react";
@@ -93,12 +93,6 @@ export function DataTableFilterCommand({
       const field=_filterFields?.find((field) => field.value===filter.id);
       return !field?.commandDisabled;
     });
-    const currentDisabledFilters=currentFilters.filter((filter) => {
-      const field=_filterFields?.find((field) => field.value===filter.id);
-      return field?.commandDisabled;
-    });
-
-
 
     for (const key of Object.keys(searchParams)) {
       const value=searchParams[key as keyof typeof searchParams];

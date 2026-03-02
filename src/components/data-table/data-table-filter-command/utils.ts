@@ -4,7 +4,7 @@ import {
   SLIDER_DELIMITER,
 } from "@/lib/delimiters";
 import {isArrayOfDates} from "@/lib/is-array";
-import type {FieldBuilder,SchemaDefinition} from "@/lib/store/schema/types";
+import type {FieldBuilder,SchemaDefinition} from "@/lib/store/schema/schemaTypes";
 import type {ColumnFiltersState} from "@tanstack/react-table";
 import type {DataTableFilterField} from "../types";
 

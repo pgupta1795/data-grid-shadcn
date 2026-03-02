@@ -1,9 +1,9 @@
 "use client";
 
 import {InputWithAddons} from "@/components/custom/input-with-addons";
-import {Slider} from "@/components/custom/slider";
 import {useDataTable} from "@/components/data-table/data-table-provider";
 import {Label} from "@/components/ui/label";
+import {Slider} from "@/components/ui/slider";
 import {useDebounce} from "@/hooks/use-debounce";
 import {isArrayOfNumbers} from "@/lib/is-array";
 import {useEffect,useState} from "react";
@@ -110,7 +110,7 @@ export function DataTableFilterSlider<TData>({
         min={min}
         max={max}
         value={input?.length===2? input:[min,max]}
-        onValueChange={(values) => setInput(values)}
+        onValueChange={(values) => setInput(values as number[])}
       />
     </div>
   );

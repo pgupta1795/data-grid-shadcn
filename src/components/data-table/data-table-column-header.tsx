@@ -1,19 +1,26 @@
-import { Button, type ButtonProps } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { Column } from "@tanstack/react-table";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import {Button,buttonVariants} from "@/components/ui/button";
+import {cn} from "@/lib/utils";
+import type {Column} from "@tanstack/react-table";
+import type {VariantProps} from 'class-variance-authority';
+import {ChevronDown,ChevronUp} from "lucide-react";
 
-interface DataTableColumnHeaderProps<TData, TValue> extends ButtonProps {
-  column: Column<TData, TValue>;
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+interface DataTableColumnHeaderProps<TData,TValue> extends ButtonProps {
+  column: Column<TData,TValue>;
   title: string;
 }
 
-export function DataTableColumnHeader<TData, TValue>({
+export function DataTableColumnHeader<TData,TValue>({
   column,
   title,
   className,
   ...props
-}: DataTableColumnHeaderProps<TData, TValue>) {
+}: DataTableColumnHeaderProps<TData,TValue>) {
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>;
   }
@@ -36,17 +43,17 @@ export function DataTableColumnHeader<TData, TValue>({
         <ChevronUp
           className={cn(
             "-mb-0.5 h-3 w-3",
-            column.getIsSorted() === "asc"
+            column.getIsSorted()==="asc"
               ? "text-accent-foreground"
-              : "text-muted-foreground",
+              :"text-muted-foreground",
           )}
         />
         <ChevronDown
           className={cn(
             "-mt-0.5 h-3 w-3",
-            column.getIsSorted() === "desc"
+            column.getIsSorted()==="desc"
               ? "text-accent-foreground"
-              : "text-muted-foreground",
+              :"text-muted-foreground",
           )}
         />
       </span>

@@ -4,7 +4,7 @@
  * This module bridges our schema field definitions to nuqs parser format.
  */
 
-import { SORT_DELIMITER } from "@/lib/delimiters";
+import {SORT_DELIMITER} from "@/lib/delimiters";
 import {
   createParser,
   parseAsArrayOf,
@@ -19,15 +19,15 @@ import type {
   FieldBuilder,
   FieldConfig,
   SchemaDefinition,
-} from "../../schema/types";
+} from "../../schema/schemaTypes";
 
 /**
  * Type mapping: Schema field type → nuqs ParserBuilder type
  */
-export type SchemaToNuqsParsers<T extends SchemaDefinition> = {
+export type SchemaToNuqsParsers<T extends SchemaDefinition>={
   [K in keyof T]: T[K] extends FieldBuilder<infer U>
-    ? ParserBuilder<U>
-    : ParserBuilder<unknown>;
+  ? ParserBuilder<U>
+  :ParserBuilder<unknown>;
 };
 
 /**
@@ -59,7 +59,7 @@ function fieldConfigToParser(
 
     case "array":
       if (config.itemConfig) {
-        const itemParser = fieldConfigToParser(config.itemConfig);
+        const itemParser=fieldConfigToParser(config.itemConfig);
         return parseAsArrayOf(
           itemParser as ParserBuilder<string>,
           config.delimiter,
@@ -73,12 +73,12 @@ function fieldConfigToParser(
     case "sort":
       return createParser({
         parse(queryValue: string) {
-          const [id, desc] = queryValue.split(SORT_DELIMITER);
+          const [id,desc]=queryValue.split(SORT_DELIMITER);
           if (!id) return null;
-          return { id, desc: desc === "desc" };
+          return {id,desc: desc==="desc"};
         },
-        serialize(value: { id: string; desc: boolean }) {
-          return `${value.id}${SORT_DELIMITER}${value.desc ? "desc" : "asc"}`;
+        serialize(value: {id: string; desc: boolean}) {
+          return `${value.id}${SORT_DELIMITER}${value.desc? "desc":"asc"}`;
         },
       }) as ParserBuilder<unknown>;
 
@@ -94,20 +94,20 @@ function applyDefault(
   parser: ParserBuilder<unknown>,
   defaultValue: unknown,
 ): ParserBuilder<unknown> {
-  if (defaultValue !== null && defaultValue !== undefined) {
+  if (defaultValue!==null&&defaultValue!==undefined) {
     // Arrays default to empty array, not worth adding .withDefault
-    if (Array.isArray(defaultValue) && defaultValue.length === 0) {
+    if (Array.isArray(defaultValue)&&defaultValue.length===0) {
       return parser;
     }
     // Only apply withDefault for non-null primitive defaults
     if (
-      typeof defaultValue === "string" ||
-      typeof defaultValue === "number" ||
-      typeof defaultValue === "boolean" ||
+      typeof defaultValue==="string"||
+      typeof defaultValue==="number"||
+      typeof defaultValue==="boolean"||
       defaultValue instanceof Date
     ) {
       return (
-        parser as ParserBuilder<unknown> & {
+        parser as ParserBuilder<unknown>&{
           withDefault: (d: unknown) => ParserBuilder<unknown>;
         }
       ).withDefault(defaultValue);
@@ -133,13 +133,13 @@ function applyDefault(
 export function schemaToNuqsParsers<T extends SchemaDefinition>(
   schema: T,
 ): SchemaToNuqsParsers<T> {
-  const parsers: Record<string, ParserBuilder<unknown>> = {};
+  const parsers: Record<string,ParserBuilder<unknown>>={};
 
-  for (const [key, fieldBuilder] of Object.entries(schema)) {
-    const config = fieldBuilder._config;
-    let parser = fieldConfigToParser(config);
-    parser = applyDefault(parser, config.defaultValue);
-    parsers[key] = parser;
+  for (const [key,fieldBuilder] of Object.entries(schema)) {
+    const config=fieldBuilder._config;
+    let parser=fieldConfigToParser(config);
+    parser=applyDefault(parser,config.defaultValue);
+    parsers[key]=parser;
   }
 
   return parsers as SchemaToNuqsParsers<T>;
@@ -149,29 +149,29 @@ export function schemaToNuqsParsers<T extends SchemaDefinition>(
  * Create a nuqs cache serializer from schema
  */
 export function createSchemaSerializer(schema: SchemaDefinition) {
-  const parsers = schemaToNuqsParsers(schema);
+  const parsers=schemaToNuqsParsers(schema);
 
-  return (state: Record<string, unknown>): string => {
-    const params = new URLSearchParams();
+  return (state: Record<string,unknown>): string => {
+    const params=new URLSearchParams();
 
-    for (const [key, parser] of Object.entries(parsers)) {
-      const value = state[key];
-      if (value === null || value === undefined) continue;
-      if (Array.isArray(value) && value.length === 0) continue;
+    for (const [key,parser] of Object.entries(parsers)) {
+      const value=state[key];
+      if (value===null||value===undefined) continue;
+      if (Array.isArray(value)&&value.length===0) continue;
 
       try {
-        const serialized = (
-          parser as { serialize?: (v: unknown) => string }
+        const serialized=(
+          parser as {serialize?: (v: unknown) => string}
         ).serialize?.(value);
         if (serialized) {
-          params.set(key, serialized);
+          params.set(key,serialized);
         }
       } catch {
         // Skip invalid values
       }
     }
 
-    const str = params.toString();
-    return str ? `?${str}` : "";
+    const str=params.toString();
+    return str? `?${str}`:"";
   };
 }

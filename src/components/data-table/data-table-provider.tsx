@@ -1,4 +1,6 @@
-import { DataTableFilterField } from "@/components/data-table/types";
+import {DataTableStoreSync} from "@/components/data-table/data-table-store-sync";
+import type {DataTableFilterField} from "@/components/data-table/types";
+import {ControlsProvider} from "@/providers/controls";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -8,9 +10,7 @@ import type {
   Table,
   VisibilityState,
 } from "@tanstack/react-table";
-import { createContext, useContext, useMemo } from "react";
-import { ControlsProvider } from "../../providers/controls";
-import { DataTableStoreSync } from "./data-table-store-sync";
+import {createContext,useContext,useMemo} from "react";
 
 // REMINDER: read about how to move controlled state out of the useReactTable hook
 // https://github.com/TanStack/table/discussions/4005#discussioncomment-7303569
@@ -25,48 +25,50 @@ interface DataTableStateContextType {
   enableColumnOrdering: boolean;
 }
 
-interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
+interface DataTableBaseContextType<TData=unknown,TValue=unknown> {
   table: Table<TData>;
   filterFields: DataTableFilterField<TData>[];
-  columns: ColumnDef<TData, TValue>[];
+  columns: ColumnDef<TData,TValue>[];
   isLoading?: boolean;
   getFacetedUniqueValues?: (
     table: Table<TData>,
     columnId: string,
-  ) => Map<string, number>;
+  ) => Map<string,number>;
   getFacetedMinMaxValues?: (
     table: Table<TData>,
     columnId: string,
-  ) => undefined | [number, number];
+  ) => undefined|[number,number];
 }
 
-interface DataTableContextType<TData = unknown, TValue = unknown>
+interface DataTableContextType<TData=unknown,TValue=unknown>
   extends DataTableStateContextType,
-    DataTableBaseContextType<TData, TValue> {}
+  DataTableBaseContextType<TData,TValue> { }
 
-export const DataTableContext = createContext<DataTableContextType<
+export const DataTableContext=createContext<DataTableContextType<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any
-> | null>(null);
+>|null>(null);
 
-export function DataTableProvider<TData, TValue>({
+export function DataTableProvider<TData,TValue>({
   children,
   ...props
-}: Partial<DataTableStateContextType> &
-  DataTableBaseContextType<TData, TValue> & {
+}: Partial<DataTableStateContextType>&
+  DataTableBaseContextType<TData,TValue>&{
     children: React.ReactNode;
   }) {
-  const value = useMemo(
+  const value=useMemo(
     // eslint-disable-next-line react-hooks/preserve-manual-memoization
     () => ({
       ...props,
-      columnFilters: props.columnFilters ?? [],
-      sorting: props.sorting ?? [],
-      rowSelection: props.rowSelection ?? {},
-      columnOrder: props.columnOrder ?? [],
-      columnVisibility: props.columnVisibility ?? {},
-      pagination: props.pagination ?? { pageIndex: 0, pageSize: 10 },
-      enableColumnOrdering: props.enableColumnOrdering ?? false,
+      columnFilters: props.columnFilters??[],
+      sorting: props.sorting??[],
+      rowSelection: props.rowSelection??{},
+      columnOrder: props.columnOrder??[],
+      columnVisibility: props.columnVisibility??{},
+      pagination: props.pagination??{pageIndex: 0,pageSize: 10},
+      enableColumnOrdering: props.enableColumnOrdering??false,
     }),
     [
       props.columnFilters,
@@ -95,12 +97,12 @@ export function DataTableProvider<TData, TValue>({
   );
 }
 
-export function useDataTable<TData, TValue>() {
-  const context = useContext(DataTableContext);
+export function useDataTable<TData,TValue>() {
+  const context=useContext(DataTableContext);
 
   if (!context) {
     throw new Error("useDataTable must be used within a DataTableProvider");
   }
 
-  return context as DataTableContextType<TData, TValue>;
+  return context as DataTableContextType<TData,TValue>;
 }

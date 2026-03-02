@@ -6,10 +6,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { cn } from "@/lib/utils";
-import { Table } from "@tanstack/react-table";
-import { endOfDay, endOfHour, startOfDay, startOfHour } from "date-fns";
+import {useCopyToClipboard} from "@/hooks/use-copy-to-clipboard";
+import {cn} from "@/lib/utils";
+import type {Table} from "@tanstack/react-table";
+import {endOfDay,endOfHour,startOfDay,startOfHour} from "date-fns";
 import {
   CalendarClock,
   CalendarDays,
@@ -20,7 +20,7 @@ import {
   Equal,
   Search,
 } from "lucide-react";
-import { DataTableFilterField } from "../types";
+import type {DataTableFilterField} from "../types";
 
 interface DataTableSheetRowActionProps<
   TData,
@@ -28,7 +28,7 @@ interface DataTableSheetRowActionProps<
 > extends React.ComponentPropsWithRef<typeof DropdownMenuTrigger> {
   fieldValue: TFields["value"];
   filterFields: TFields[];
-  value: string | number;
+  value: string|number;
   table: Table<TData>;
 }
 
@@ -44,12 +44,12 @@ export function DataTableSheetRowAction<
   table,
   onKeyDown,
   ...props
-}: DataTableSheetRowActionProps<TData, TFields>) {
-  const { copy, isCopied } = useCopyToClipboard();
-  const field = filterFields.find((field) => field.value === fieldValue);
-  const column = table.getColumn(fieldValue.toString());
+}: DataTableSheetRowActionProps<TData,TFields>) {
+  const {copy,isCopied}=useCopyToClipboard();
+  const field=filterFields.find((field) => field.value===fieldValue);
+  const column=table.getColumn(fieldValue.toString());
 
-  if (!field || !column) return null;
+  if (!field||!column) return null;
 
   function renderOptions() {
     if (!field) return null;
@@ -59,12 +59,12 @@ export function DataTableSheetRowAction<
           <DropdownMenuItem
             onClick={() => {
               // FIXME:
-              const filterValue = column?.getFilterValue() as
-                | undefined
-                | Array<unknown>;
-              const newValue = filterValue?.includes(value)
+              const filterValue=column?.getFilterValue() as
+                |undefined
+                |Array<unknown>;
+              const newValue=filterValue?.includes(value)
                 ? filterValue
-                : [...(filterValue || []), value];
+                :[...(filterValue||[]),value];
 
               column?.setFilterValue(newValue);
             }}
@@ -84,14 +84,14 @@ export function DataTableSheetRowAction<
         return (
           <DropdownMenuGroup>
             <DropdownMenuItem
-              onClick={() => column?.setFilterValue([0, value])}
+              onClick={() => column?.setFilterValue([0,value])}
             >
               {/* FIXME: change icon as it is not clear */}
               <ChevronLeft />
               Less or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => column?.setFilterValue([value, 5000])}
+              onClick={() => column?.setFilterValue([value,5000])}
             >
               {/* FIXME: change icon as it is not clear */}
               <ChevronRight />
@@ -104,35 +104,37 @@ export function DataTableSheetRowAction<
           </DropdownMenuGroup>
         );
       case "timerange":
-        const date = new Date(value);
-        return (
-          <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => column?.setFilterValue([date])}>
-              <CalendarSearch />
-              Exact timestamp
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                const start = startOfHour(date);
-                const end = endOfHour(date);
-                column?.setFilterValue([start, end]);
-              }}
-            >
-              <CalendarClock />
-              Same hour
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                const start = startOfDay(date);
-                const end = endOfDay(date);
-                column?.setFilterValue([start, end]);
-              }}
-            >
-              <CalendarDays />
-              Same day
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        );
+        {
+          const date=new Date(value);
+          return (
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={() => column?.setFilterValue([date])}>
+                <CalendarSearch />
+                Exact timestamp
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const start=startOfHour(date);
+                  const end=endOfHour(date);
+                  column?.setFilterValue([start,end]);
+                }}
+              >
+                <CalendarClock />
+                Same hour
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const start=startOfDay(date);
+                  const end=endOfDay(date);
+                  column?.setFilterValue([start,end]);
+                }}
+              >
+                <CalendarDays />
+                Same day
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          );
+        }
       default:
         return null;
     }
@@ -147,7 +149,7 @@ export function DataTableSheetRowAction<
           className,
         )}
         onKeyDown={(e) => {
-          if (e.key === "ArrowDown") {
+          if (e.key==="ArrowDown") {
             // REMINDER: default behavior is to open the dropdown menu
             // But because we use it to navigate between rows, we need to prevent it
             // and only use "Enter" to select the option
@@ -158,17 +160,17 @@ export function DataTableSheetRowAction<
         {...props}
       >
         {children}
-        {isCopied ? (
+        {isCopied? (
           <div className="absolute inset-0 place-content-center bg-background/70">
             Value copied
           </div>
-        ) : null}
+        ):null}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="left">
         {renderOptions()}
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => copy(String(value), { timeout: 1000 })}
+          onClick={() => copy(String(value),{timeout: 1000})}
         >
           <Copy />
           Copy value

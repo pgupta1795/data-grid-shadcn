@@ -3,20 +3,20 @@ import {
   TableBody,
   TableCell,
   TableRow,
-} from "@/components/custom/table";
-import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { Check, Copy } from "lucide-react";
+} from "@/components/ui/table";
+import {useCopyToClipboard} from "@/hooks/use-copy-to-clipboard";
+import {Check,Copy} from "lucide-react";
 
 interface KVTableProps {
-  data: Record<string, string | number | boolean>;
+  data: Record<string,string|number|boolean>;
 }
-export function KVTable({ data }: KVTableProps) {
+export function KVTable({data}: KVTableProps) {
   return (
     <div className="mx-auto max-w-lg">
       <div className="overflow-hidden rounded-lg border border-border bg-background">
         <Table>
           <TableBody>
-            {Object.entries(data).map(([key, value]) => {
+            {Object.entries(data).map(([key,value]) => {
               return <RowAction key={key} label={key} value={value} />;
             })}
           </TableBody>
@@ -31,9 +31,9 @@ function RowAction({
   value,
 }: {
   label: string;
-  value: string | number | boolean;
+  value: string|number|boolean;
 }) {
-  const { copy, isCopied } = useCopyToClipboard();
+  const {copy,isCopied}=useCopyToClipboard();
 
   return (
     <TableRow
@@ -49,9 +49,9 @@ function RowAction({
       <TableCell className="relative py-1 font-mono">
         {value}
         <div className="invisible absolute right-1.5 top-1.5 rounded-sm border border-border bg-background p-0.5 backdrop-blur-sm group-hover:visible">
-          {!isCopied ? (
+          {!isCopied? (
             <Copy className="h-3 w-3" />
-          ) : (
+          ):(
             <Check className="h-3 w-3" />
           )}
         </div>

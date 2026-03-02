@@ -1,46 +1,46 @@
 "use client";
 
-import { Kbd } from "@/components/custom/kbd";
-import { useDataTable } from "@/components/data-table/data-table-provider";
-import { Button } from "@/components/ui/button";
+import {Kbd} from "@/components/custom/kbd";
+import {useDataTable} from "@/components/data-table/data-table-provider";
+import {Button} from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useHotKey } from "@/hooks/use-hot-key";
-import { formatCompactNumber } from "@/lib/format";
-import { useControls } from "@/providers/controls";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { useMemo } from "react";
-import { DataTableFilterControlsDrawer } from "./data-table-filter-controls-drawer";
-import { DataTableResetButton } from "./data-table-reset-button";
-import { DataTableViewOptions } from "./data-table-view-options";
+import {useHotKey} from "@/hooks/use-hot-key";
+import {formatCompactNumber} from "@/lib/format";
+import {useControls} from "@/providers/controls";
+import {PanelLeftClose,PanelLeftOpen} from "lucide-react";
+import {useMemo} from "react";
+import {DataTableFilterControlsDrawer} from "./data-table-filter-controls-drawer";
+import {DataTableResetButton} from "./data-table-reset-button";
+import {DataTableViewOptions} from "./data-table-view-options";
 
 interface DataTableToolbarProps {
   renderActions?: () => React.ReactNode;
 }
 
-export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
-  const { table, isLoading, columnFilters } = useDataTable();
-  const { open, setOpen } = useControls();
-  useHotKey(() => setOpen((prev) => !prev), "b");
-  const filters = table.getState().columnFilters;
+export function DataTableToolbar({renderActions}: DataTableToolbarProps) {
+  const {table}=useDataTable();
+  const {open,setOpen}=useControls();
+  useHotKey(() => setOpen((prev) => !prev),"b");
+  const filters=table.getState().columnFilters;
 
-  const rows = useMemo(
+  const rows=useMemo(
     () => ({
       total: table.getCoreRowModel().rows.length,
       filtered: table.getFilteredRowModel().rows.length,
     }),
-    [isLoading, columnFilters, table],
+    [table],
   );
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex flex-wrap items-center gap-2">
         <TooltipProvider>
-          <Tooltip delayDuration={100}>
+          <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 size="sm"
@@ -48,12 +48,12 @@ export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
                 onClick={() => setOpen((prev) => !prev)}
                 className="hidden gap-2 sm:flex"
               >
-                {open ? (
+                {open? (
                   <>
                     <PanelLeftClose className="h-4 w-4" />
                     <span className="hidden md:block">Hide Controls</span>
                   </>
-                ) : (
+                ):(
                   <>
                     <PanelLeftOpen className="h-4 w-4" />
                     <span className="hidden md:block">Show Controls</span>
@@ -95,7 +95,7 @@ export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
         </div>
       </div>
       <div className="ml-auto flex items-center gap-2">
-        {filters.length ? <DataTableResetButton /> : null}
+        {filters.length? <DataTableResetButton />:null}
         {renderActions?.()}
         <DataTableViewOptions />
       </div>

@@ -2,12 +2,12 @@
  * nuqs Adapter Types
  */
 
-import type { CreateAdapterOptions } from "../../adapter/types";
+import type {CreateAdapterOptions} from "../../adapter/adapterTypes";
 
 /**
  * nuqs-specific adapter options
  */
-export interface NuqsAdapterOptions<T extends Record<string, unknown>>
+export interface NuqsAdapterOptions<T extends Record<string,unknown>>
   extends CreateAdapterOptions<T> {
   /**
    * Use shallow routing (default: true)
@@ -17,7 +17,7 @@ export interface NuqsAdapterOptions<T extends Record<string, unknown>>
   /**
    * History mode: 'push' | 'replace' (default: 'push')
    */
-  history?: "push" | "replace";
+  history?: "push"|"replace";
 
   /**
    * Scroll to top on change (default: false)

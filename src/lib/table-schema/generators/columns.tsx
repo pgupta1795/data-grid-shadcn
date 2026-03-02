@@ -1,17 +1,16 @@
 "use client";
 
-import {
-  DataTableCellBadge,
-  DataTableCellBoolean,
-  DataTableCellCode,
-  DataTableCellNumber,
-  DataTableCellText,
-  DataTableCellTimestamp,
-} from "@/components/data-table/data-table-cell";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { JSX } from "react";
-import type { ColConfig, DisplayConfig, TableSchemaDefinition } from "../types";
+import {DataTableCellBadge} from "@/components/data-table/data-table-cell/data-table-cell-badge";
+import {DataTableCellBoolean} from "@/components/data-table/data-table-cell/data-table-cell-boolean";
+import {DataTableCellCode} from "@/components/data-table/data-table-cell/data-table-cell-code";
+import {DataTableCellNumber} from "@/components/data-table/data-table-cell/data-table-cell-number";
+import {DataTableCellText} from "@/components/data-table/data-table-cell/data-table-cell-text";
+import {DataTableCellTimestamp} from "@/components/data-table/data-table-cell/data-table-cell-timestamp";
+
+import {DataTableColumnHeader} from "@/components/data-table/data-table-column-header";
+import type {ColumnDef} from "@tanstack/react-table";
+import type {JSX} from "react";
+import type {ColConfig,DisplayConfig,TableSchemaDefinition} from "../types";
 
 /**
  * Derive the TanStack Table filterFn name from a column config.
@@ -19,10 +18,10 @@ import type { ColConfig, DisplayConfig, TableSchemaDefinition } from "../types";
  * Custom filterFns (arrSome, inDateRange) must be registered on the table:
  *   filterFns: { inDateRange, arrSome }  // from src/lib/table/filterfns.ts
  */
-function getFilterFn(config: ColConfig): string | undefined {
+function getFilterFn(config: ColConfig): string|undefined {
   if (!config.filter) return undefined;
 
-  const { kind, filter, arrayItem } = config;
+  const {kind,filter}=config;
 
   switch (filter.type) {
     case "timerange":
@@ -30,12 +29,12 @@ function getFilterFn(config: ColConfig): string | undefined {
     case "slider":
       return "inNumberRange"; // TanStack built-in
     case "input":
-      if (kind === "string") return "includesString"; // TanStack built-in
-      if (kind === "number") return "equals"; // TanStack built-in
+      if (kind==="string") return "includesString"; // TanStack built-in
+      if (kind==="number") return "equals"; // TanStack built-in
       return undefined;
     case "checkbox":
       // Array columns use arrIncludesSome (checks row's array for filter values)
-      if (kind === "array") return "arrIncludesSome"; // TanStack built-in
+      if (kind==="array") return "arrIncludesSome"; // TanStack built-in
       // Single-value columns use arrSome (checks if row value is in filter array)
       return "arrSome"; // custom — must be registered
   }
@@ -48,7 +47,7 @@ function renderCell(
   display: DisplayConfig,
   value: unknown,
   row: unknown,
-): JSX.Element | null {
+): JSX.Element|null {
   switch (display.type) {
     case "text":
       return <DataTableCellText value={value as string} />;
@@ -65,7 +64,7 @@ function renderCell(
     case "boolean":
       return <DataTableCellBoolean value={value as boolean} />;
     case "custom":
-      return display.cell(value, row);
+      return display.cell(value,row);
   }
 }
 
@@ -95,39 +94,39 @@ function renderCell(
 export function generateColumns<TData>(
   schema: TableSchemaDefinition,
 ): ColumnDef<TData>[] {
-  return Object.entries(schema).map(([key, builder]) => {
-    const config = builder._config;
-    const isDotted = key.includes(".");
-    const filterFn = getFilterFn(config);
+  return Object.entries(schema).map(([key,builder]) => {
+    const config=builder._config;
+    const isDotted=key.includes(".");
+    const filterFn=getFilterFn(config);
 
-    const header = config.sortable
+    const header=config.sortable
       ? ({
-          column,
-        }: {
-          column: Parameters<typeof DataTableColumnHeader>[0]["column"];
-        }) => <DataTableColumnHeader column={column} title={config.label} />
-      : config.label;
+        column,
+      }: {
+        column: Parameters<typeof DataTableColumnHeader>[0]["column"];
+      }) => <DataTableColumnHeader column={column} title={config.label} />
+      :config.label;
 
-    const cell = ({
+    const cell=({
       getValue,
       row,
     }: {
       getValue: () => unknown;
-      row: { original: TData };
-    }) => renderCell(config.display, getValue(), row.original);
+      row: {original: TData};
+    }) => renderCell(config.display,getValue(),row.original);
 
-    const meta = {
+    const meta={
       label: config.label,
       hidden: config.hidden,
     };
 
-    const base = {
+    const base={
       header,
       cell,
-      ...(filterFn ? { filterFn } : {}),
-      ...(config.size !== undefined
-        ? { size: config.size, minSize: config.size }
-        : {}),
+      ...(filterFn? {filterFn}:{}),
+      ...(config.size!==undefined
+        ? {size: config.size,minSize: config.size}
+        :{}),
       meta,
     };
 
@@ -135,7 +134,7 @@ export function generateColumns<TData>(
       return {
         ...base,
         id: key,
-        accessorFn: (row: TData) => (row as Record<string, unknown>)[key],
+        accessorFn: (row: TData) => (row as Record<string,unknown>)[key],
       } as ColumnDef<TData>;
     }
 

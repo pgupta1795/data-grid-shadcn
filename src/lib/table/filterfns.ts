@@ -1,29 +1,25 @@
-import { FilterFn } from "@tanstack/react-table";
-import { isAfter, isBefore, isSameDay } from "date-fns";
-import { isArrayOfDates } from "../is-array";
+import type {FilterFn} from "@tanstack/react-table";
+import {isAfter,isBefore,isSameDay} from "date-fns";
+import {isArrayOfDates} from "../is-array";
 
-export const inDateRange: FilterFn<any> = (row, columnId, value) => {
-  const date = new Date(row.getValue(columnId));
-  const [start, end] = value as Date[];
+export const inDateRange: FilterFn<unknown>=(row,columnId,value) => {
+  const date=new Date(row.getValue(columnId));
+  const [start,end]=value as Date[];
 
   if (isNaN(date.getTime())) return false;
 
   // if no end date, check if it's the same day
-  if (!end) return isSameDay(date, start);
+  if (!end) return isSameDay(date,start);
 
-  return isAfter(date, start) && isBefore(date, end);
+  return isAfter(date,start)&&isBefore(date,end);
 };
 
-inDateRange.autoRemove = (val: any) =>
-  !Array.isArray(val) || !val.length || !isArrayOfDates(val);
+inDateRange.autoRemove=(val: unknown) =>
+  !Array.isArray(val)||!val.length||!isArrayOfDates(val);
 
-export const arrSome: FilterFn<any> = (row, columnId, filterValue) => {
+export const arrSome: FilterFn<unknown>=(row,columnId,filterValue) => {
   if (!Array.isArray(filterValue)) return false;
-  return filterValue.some((val) => row.getValue<unknown[]>(columnId) === val);
+  return filterValue.some((val) => row.getValue<unknown[]>(columnId)===val);
 };
 
-arrSome.autoRemove = (val: any) => !Array.isArray(val) || !val?.length;
-
-function testFalsey(val: any) {
-  return val === undefined || val === null || val === "";
-}
+arrSome.autoRemove=(val: unknown) => !Array.isArray(val)||!val?.length;
