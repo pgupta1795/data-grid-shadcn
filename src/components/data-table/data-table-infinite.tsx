@@ -28,7 +28,7 @@ import {
   getColumnVisibilityKey,
 } from "@/lib/constants/local-storage";
 import {formatCompactNumber} from "@/lib/format";
-import {useFilterState} from "@/lib/store/hooks";
+import {useFilterState} from "@/lib/store/hooks/useFilterState";
 import type {SchemaDefinition} from "@/lib/store/schema/schemaTypes";
 import {arrSome,inDateRange} from "@/lib/table/filterfns";
 import {cn} from "@/lib/utils";

@@ -12,7 +12,7 @@
  * we've sent to avoid depending on BYOS state, which would cause infinite loops.
  */
 import {useStoreContext} from "@/lib/store/context";
-import {useFilterActions} from "@/lib/store/hooks";
+import {useFilterActions} from "@/lib/store/hooks/useFilterActions";
 import {useEffect,useRef} from "react";
 import {useDataTable} from "./data-table-provider";
 
